@@ -5,6 +5,7 @@ import HomeLayout from "./pages/HomeLayout";
 import { loader as homeloader } from "./pages/Home";
 import { loader as geteventloader } from "./pages/GetEventID";
 import GetEventID from "./pages/GetEventID";
+import Purchaseticket from "./pages/Purchaseticket";
 
 function App() {
   const router = createBrowserRouter([
@@ -23,6 +24,11 @@ function App() {
           path: "geteventid/:id",
           element: <GetEventID />,
           loader: geteventloader,
+        },
+        {
+          path: "purchaseticket",
+          element: <Purchaseticket />,
+          // loader: geteventloader,
         },
       ],
     },

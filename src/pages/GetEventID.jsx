@@ -1,11 +1,12 @@
+import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
-import { FaTicket } from "react-icons/fa6";
+import { FaTicketAlt, FaTimes } from "react-icons/fa";
 import Footer from "../components/Footer";
 import axios from "axios";
-import { redirect, useLoaderData } from "react-router-dom";
+import { Link, redirect, useLoaderData } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
-import { useEffect, useState } from "react";
 import Loader from "../components/Loader";
+import { motion } from "framer-motion";
 import PopupCartBar from "../components/PopupCartBar";
 
 export const loader = async ({ params }) => {
@@ -20,7 +21,7 @@ export const loader = async ({ params }) => {
 };
 
 function GetEventID() {
-  const eventDate = new Date("2024-10-25T09:00:00"); // Set your event date
+  const eventDate = new Date("2024-10-25T09:00:00");
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -28,7 +29,6 @@ function GetEventID() {
     seconds: 0,
   });
 
-  // Countdown calculation logic
   const calculateTimeLeft = () => {
     const now = new Date();
     const difference = eventDate - now;
@@ -53,18 +53,28 @@ function GetEventID() {
     return () => clearInterval(timer);
   }, []);
 
-  const [isLoading, setIsLoading] = useState(true);
-
-  const handleMapLoad = () => {
-    setIsLoading(false); // Set loading to false when the iframe has loaded
-  };
-
   const selectedEvent = useLoaderData();
-  console.log(selectedEvent);
-
   const baseImageUrl = "https://api.tikiti.co.zw/opn/v1/files";
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768); // Track if on small screens
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [premiumQuantity, setPremiumQuantity] = useState(0);
+  const [standardQuantity, setStandardQuantity] = useState(0);
+  const ticketPrices = {
+    premium: 50,
+    standard: 30,
+  };
+
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Calculate the total price whenever the quantities change
+  useEffect(() => {
+    const total =
+      ticketPrices.premium * premiumQuantity +
+      ticketPrices.standard * standardQuantity;
+    setTotalPrice(total);
+  }, [premiumQuantity, standardQuantity]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -74,12 +84,21 @@ function GetEventID() {
     setIsSidebarOpen(false);
   };
 
-  // Handle window resize to show/hide sidebar or topbar based on screen size
+  // const handlePurchaseClick = () => {
+  //   if (premiumQuantity > 0 || standardQuantity > 0) {
+  //     setIsModalOpen(true);
+  //   }
+  // };
+
+  const handlePurchaseClick = () => {
+    setIsModalOpen(true);
+  };
+
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768); // Set mobile state based on screen width
+      setIsMobile(window.innerWidth <= 768);
       if (window.innerWidth > 768) {
-        setIsSidebarOpen(false); // Hide sidebar when resizing to larger screens
+        setIsSidebarOpen(false);
       }
     };
     window.addEventListener("resize", handleResize);
@@ -88,161 +107,158 @@ function GetEventID() {
 
   return (
     <>
-    <div className="relative h-[100vh]">|
-      <div className="items-center flex justify-center h-full">
-      <div className="absolute">
-        <div>
-
-        <PopupCartBar/>
-
+      <div className="relative h-[100vh]">
+        <Navbar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+        <div className="z-50">
+          <Sidebar
+            isSidebarOpen={isSidebarOpen}
+            isMobile={isMobile}
+            toggleClose={toggleClose}
+          />
         </div>
-   
-      </div>
-      </div>
-     
- 
 
-    <Navbar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-      {/* Sidebar for small screens */}
-      <div className="z-50">
-        <Sidebar
-          isSidebarOpen={isSidebarOpen}
-          isMobile={isMobile}
-          toggleClose={toggleClose}
-        />
-      </div>
+        <div className="w-[90%] md:w-[96%] lg:w-[85%] mt-5 m-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2  gap-8">
+            {/* Left Section - Event Image */}
+            <div className="w-full md:h-[18.5rem] relative md:bg-gray-200 rounded-lg">
+              <div className="bg-black/20 w-full absolute h-[12rem] overflow-hidden z-10"></div>
+              <img
+                src={`${baseImageUrl}?fileName=${selectedEvent.imageFileName}`}
+                alt="Event"
+                className="object-cover w-full md:h-full"
+              />
 
-      <div className="w-[90%] md:w-[96%] lg:w-[85%] mt-5 m-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2  gap-8">
-          {/* Left Section - Event Image */}
-          <div className="w-full md:h-[18.5rem] relative md:bg-gray-200 rounded-lg">
-            {baseImageUrl ? (
-              <>
-                <div className="bg-black/20 w-full absolute md:h-full overflow-hidden z-10"></div>
-                <img
-                  src={`${baseImageUrl}?fileName=${selectedEvent.imageFileName}`}
-                  alt="Event"
-                  className="object-cover w-full md:h-full"
-                />
-              </>
-            ) : (
-              <Loader />
-            )}
+              {/* Event Organizer */}
+              <div className="mt-4 border rounded-lg shadow-sm p-4 bg-white flex justify-between items-center">
+                <div className="flex flex-col">
+                  <h2 className="lg:text-[18px] text-[15px]   font-semibold">
+                    Organized by
+                  </h2>
+                  <p className="text-gray-600">Zimpraise</p>
+                </div>
+                <div className="border border-green-500 flex items-center gap-3 p-2">
+                  <FaTicketAlt className="text-green-500 text-[1rem] md:text-[2rem]" />
+                  <p className="font-bold text-red-500">
+                    Only 20 tickets left!
+                  </p>
+                </div>
+              </div>
 
-            {/* Event Organizer */}
-            <div className="mt-4 border rounded-lg shadow-sm p-4 bg-white flex justify-between items-center">
-              <div className="flex flex-col">
-                <h2 className="lg:text-[16px] text-[15px]   font-semibold">
-                  Organized by
+              {/* Description */}
+              <div className="mt-8 border rounded-lg shadow-sm p-4 bg-white">
+                <h2 className="lg:text-[18px] text-[15px]   font-semibold">
+                  About This Event
                 </h2>
-                <p className="text-gray-600">Zimpraise</p>
-              </div>
-              <div className="border border-green-500 flex items-center gap-3 p-2">
-                <FaTicket className="text-green-500 text-[1rem] md:text-[2rem]" />
-                <p className="font-bold text-red-500">Only 20 tickets left!</p>
+                <p className="text-gray-600 mt-2">{selectedEvent.details}</p>
               </div>
             </div>
 
-            {/* Description */}
-            <div className="mt-8 border rounded-lg shadow-sm p-4 bg-white">
-              <h2 className="lg:text-[18px] text-[15px]   font-semibold">
-                About This Event
-              </h2>
-              <p className="text-gray-600 mt-2">{selectedEvent.details}</p>
+            {/* Right Section - Event Info */}
+            <div className="space-y-4 h-[48rem] md:h-[43rem] md:overflow-auto">
+              {/* Event Info */}
+              <div className="border rounded-lg shadow-sm p-4 bg-white">
+                <h1 className="xl:text-2xl text-xl font-bold">
+                  {selectedEvent.name}
+                </h1>
+                <p className="text-gray-600 md:text-[18px] text-[15px]">
+                  Location: {selectedEvent.location.description}
+                </p>
+                <p className="text-gray-600 md:text-[18px] text-[15px]">
+                  Date: {selectedEvent.date}
+                </p>
+                {/* <p className="text-gray-600">Time: 9:00 AM - 5:00 PM (ADST)</p> */}
+                {/* <div className="lg:text-[18px] text-[15px]  font-semibold text-green-600">
+                  USD: $3
+                </div> */}
+                <button
+                  onClick={handlePurchaseClick}
+                  className="mt-4 w-full bg-green-600 md:text-[17px] text-[15px] text-white py-2 rounded-lg hover:bg-green-700 transition"
+                >
+                  Purchase Ticket
+                </button>
+              </div>
+
+              {/* Countdown */}
+              <div className="border rounded-lg shadow-sm p-4 bg-white">
+                <h2 className="lg:text-[18px] text-[15px]   font-semibold text-center">
+                  Booking will end on November 1st, 2024
+                </h2>
+                <div className="flex justify-center space-x-4 text-center mt-4">
+                  <div className="text-gray-600">
+                    <span className="block lg:text-[25px] text-[20px] bg-green-500 text-white rounded-md p-3 font-bold">
+                      {timeLeft.days || "0"}
+                    </span>
+                    <span className="block lg:text-[16px] text-[15px]  ">
+                      Days
+                    </span>
+                  </div>
+                  <div className="text-gray-600">
+                    <span className="block lg:text-[25px] text-[20px] bg-green-500 text-white rounded-md p-3 font-bold">
+                      {timeLeft.hours || "0"}
+                    </span>
+                    <span className="block lg:text-[16px] text-[15px]  ">
+                      Hours
+                    </span>
+                  </div>
+                  <div className="text-gray-600">
+                    <span className="block lg:text-[25px] text-[20px] bg-green-500 text-white rounded-md p-3 font-bold">
+                      {timeLeft.minutes || "0"}
+                    </span>
+                    <span className="block lg:text-[16px] text-[15px]  ">
+                      Minutes
+                    </span>
+                  </div>
+                  <div className="text-gray-600">
+                    <span className="block lg:text-[25px] text-[20px] bg-green-500 text-white rounded-md p-3 font-bold">
+                      {timeLeft.seconds || "0"}
+                    </span>
+                    <span className="block lg:text-[16px] text-[15px]  ">
+                      Seconds
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Date & Time Section */}
+              <div className="border rounded-lg shadow-sm p-3 bg-white">
+                <h3 className="text-lg font-semibold mt-4">Date & Time</h3>
+                <p className="text-gray-600 md:text-[18px] text-[15px]">
+                  Start Time - {selectedEvent.time}
+                </p>
+                <p className="text-gray-600 md:text-[18px] text-[15px]">
+                  Date - {selectedEvent.date}
+                </p>
+              </div>
+
+              {/* Location Section */}
+              <div className="border rounded-lg shadow-sm p-4 bg-white">
+                <h3 className="text-lg font-semibold mt-4 ">Location</h3>
+                <p className="text-gray-600 md:text-[18px] text-[15px]">
+                  {selectedEvent.location.description}
+                </p>
+              </div>
+
+              {/* Refund Policy Section */}
+              <div className="border rounded-lg shadow-sm p-4 bg-white">
+                <h3 className="text-lg font-semibold mt-4">Refund Policy</h3>
+                <p className="text-gray-600 md:text-[18px] text-[15px]">
+                  Full refunds are available up to 7 days before the event. No
+                  refunds will be issued after this date.
+                </p>
+              </div>
             </div>
           </div>
-
-          {/* Right Section - Event Info */}
-          <div className="space-y-4 h-[48rem] md:h-[43rem] md:overflow-auto">
-            {/* Event Info */}
-            <div className="border rounded-lg shadow-sm p-4 bg-white">
-              <h1 className="xl:text-[18px] text-xl font-bold">
-                {selectedEvent.name}
-              </h1>
-              <p className="text-gray-600 xl:text-[16px] text-[15px]">
-                Location: {selectedEvent.location.description}
-              </p>
-              <p className="text-gray-600 xl:text-[16px] text-[15px]">
-                Date: {selectedEvent.date}
-              </p>
-              {/* <p className="text-gray-600">Time: 9:00 AM - 5:00 PM (ADST)</p> */}
-              <div className="lg:text-[18px] text-[15px]  font-semibold text-green-600">
-                USD: $3
-              </div>
-              <button className="mt-4 w-full bg-green-600 xl:text-[16px] text-[15px] text-white py-2 rounded-lg hover:bg-green-700 transition">
-                Purchase Ticket
-              </button>
-            </div>
-
-            {/* Countdown */}
-            <div className="border rounded-lg shadow-sm p-4 bg-white">
-              <h2 className="lg:text-[18px] text-[15px]   font-semibold text-center">
-                Booking will end on November 1st, 2024
-              </h2>
-              <div className="flex justify-center space-x-4 text-center mt-4">
-                <div className="text-gray-600">
-                  <span className="block lg:text-[25px] text-[20px] bg-green-500 text-white rounded-md p-3 font-bold">
-                    {timeLeft.days || "0"}
-                  </span>
-                  <span className="block lg:text-[18px] text-[15px]  ">
-                    Days
-                  </span>
-                </div>
-                <div className="text-gray-600">
-                  <span className="block lg:text-[25px] text-[20px] bg-green-500 text-white rounded-md p-3 font-bold">
-                    {timeLeft.hours || "0"}
-                  </span>
-                  <span className="block lg:text-[18px] text-[15px]  ">
-                    Hours
-                  </span>
-                </div>
-                <div className="text-gray-600">
-                  <span className="block lg:text-[25px] text-[20px] bg-green-500 text-white rounded-md p-3 font-bold">
-                    {timeLeft.minutes || "0"}
-                  </span>
-                  <span className="block lg:text-[18px] text-[15px]  ">
-                    Minutes
-                  </span>
-                </div>
-                <div className="text-gray-600">
-                  <span className="block lg:text-[25px] text-[20px] bg-green-500 text-white rounded-md p-3 font-bold">
-                    {timeLeft.seconds || "0"}
-                  </span>
-                  <span className="block lg:text-[18px] text-[15px]  ">
-                    Seconds
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Date & Time Section */}
-            <div className="border rounded-lg shadow-sm p-3 bg-white">
-              <h3 className="text-lg font-semibold mt-4">Date & Time</h3>
-              <p className="text-gray-600 xl:text-[16px] text-[15px]">
-                Start Time - {selectedEvent.time}
-              </p>
-              <p className="text-gray-600 xl:text-[16px] text-[15px]">
-                Date - {selectedEvent.date}
-              </p>
-            </div>
-
-            {/* Location Section */}
-            <div className="border rounded-lg shadow-sm p-4 bg-white">
-              <h3 className="text-lg font-semibold mt-4 ">Location</h3>
-              <p className="text-gray-600 xl:text-[16px] text-[15px]">
-                {selectedEvent.location.description}
-              </p>
-            </div>
-
-            {/* Refund Policy Section */}
-            <div className="border rounded-lg shadow-sm p-4 bg-white">
-              <h3 className="text-lg font-semibold mt-4">Refund Policy</h3>
-              <p className="text-gray-600 xl:text-[16px] text-[15px]">
-                Full refunds are available up to 7 days before the event. No
-                refunds will be issued after this date.
-              </p>
-            </div>
-          </div>
+          {/* Modal for Ticket Purchase */}
+          <PopupCartBar
+            setPremiumQuantity={setPremiumQuantity}
+            setStandardQuantity={setStandardQuantity}
+            standardQuantity={standardQuantity}
+            premiumQuantity={premiumQuantity}
+            isModalOpen={isModalOpen}
+            setIsModalOpen={setIsModalOpen}
+            ticketPrices={ticketPrices}
+            totalPrice={totalPrice}
+          />
         </div>
 
         {/* Location Map */}
@@ -267,11 +283,9 @@ function GetEventID() {
             ></iframe>
           </div>
         </div>
-      </div>
-      <Footer />
 
-    </div>
-     
+        <Footer />
+      </div>
     </>
   );
 }
