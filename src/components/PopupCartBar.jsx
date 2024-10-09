@@ -89,17 +89,17 @@ function PopupCartBar({
               {/* Price */}
               <div className="px-2 py-[1.5rem] ">
                 <div className="flex  justify-between items-center mb-2">
-                  <p className="text-[13px] md:text-[15px] lg:text-[16px] text-gray-500 font-semibold">
+                  <p className="text-[13px] md:text-[13px] lg:text-[16px] text-gray-500 font-semibold">
                     Price
                   </p>
-                  <p className="text-black/70 text-[14px] md:text-[15px] font-semibold">
+                  <p className="text-black/70 text-[14px] lg:text-[15px] md:text-[13px] font-semibold">
                     {ticket.currencyCode} {ticket.price.toFixed(2)}
                   </p>
                 </div>
 
                 {/* Available Tickets */}
                 <div className="flex  justify-between items-center mb-2">
-                  <p className="text-[13px] md:text-[15px] lg:text-[16px] text-gray-500 font-semibold">
+                  <p className="text-[13px] md:text-[13px] lg:text-[16px] text-gray-500 font-semibold">
                     Available Tickets
                   </p>
                   <p className="text-gray-800 text-[14px] md:text-[15px] font-normal">
@@ -111,7 +111,7 @@ function PopupCartBar({
                 <div className="flex flex-col">
                   <label
                     htmlFor={`quantity-${ticket.uid}`}
-                    className="mb-1 text-[13px] md:text-[15px] lg:text-[16px] text-gray-500"
+                    className="mb-1 text-[13px] md:text-[13px] lg:text-[16px] text-gray-500"
                   >
                     Quantity
                   </label>
@@ -142,26 +142,23 @@ function PopupCartBar({
 
       <div className="flex justify-between">
         <div></div>
-        <Link to="/purchaseticket">
-          <motion.button
-            className={`text-[12px] md:text-[14px] text-white py-2 px-8 rounded hover:bg-green-700 transition ${
-              (
-                Object.values(quantities).reduce((acc, qty) => acc + qty, 0) ===
-                0
-              ) ?
-                "bg-gray-400 cursor-not-allowed"
-              : "bg-green-600 hover:bg-green-700"
-            }`}
-            disabled={
-              Object.values(quantities).reduce((acc, qty) => acc + qty, 0) === 0
-            }
-            whileHover={{ scale: 1.1 }}
-            transition={{ duration: 0.3 }}
-            whileTap={{ scale: 0.85 }}
-          >
-            Book
-          </motion.button>
-        </Link>
+        {/* <Link to="/purchaseticket"> */}
+        <motion.button
+          className={`text-[12px] md:text-[14px] text-white py-2 px-8 rounded hover:bg-green-700 transition ${
+            Object.values(quantities).reduce((acc, qty) => acc + qty, 0) === 0 ?
+              "bg-gray-400 cursor-not-allowed"
+            : "bg-green-600 hover:bg-green-700"
+          }`}
+          disabled={
+            Object.values(quantities).reduce((acc, qty) => acc + qty, 0) === 0
+          }
+          whileHover={{ scale: 1.1 }}
+          transition={{ duration: 0.3 }}
+          whileTap={{ scale: 0.85 }}
+        >
+          Book
+        </motion.button>
+        {/* </Link> */}
       </div>
     </div>
   );
