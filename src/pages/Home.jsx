@@ -192,9 +192,10 @@ function Home() {
                         </h3>
                       </div>
                     </div>
-                    <p className="font-bold text-lg sm:text-[14px] text-[12.8px] text-black/80">
+
+                    {/* <p className="font-bold text-lg sm:text-[14px] text-[12.8px] text-black/80">
                       From $10
-                    </p>
+                    </p> */}
 
                     {(
                       loading[event.uid] // Check if the specific button is loading
