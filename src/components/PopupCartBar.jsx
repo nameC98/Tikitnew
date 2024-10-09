@@ -1,161 +1,169 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
 function PopupCartBar({
-  setPremiumQuantity,
-  setStandardQuantity,
-  standardQuantity,
-  premiumQuantity,
   isModalOpen,
   setIsModalOpen,
-  ticketPrices,
-  totalPrice,
+  tickets, // Array of ticket objects from the database
 }) {
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [ticketPrices, setTicketPrices] = useState({});
+  const [quantities, setQuantities] = useState({});
+
+  // Initialize ticketPrices from tickets array
+  useEffect(() => {
+    const prices = {};
+    tickets.forEach((ticket) => {
+      prices[ticket.name.toLowerCase()] = ticket.price; // Use ticket name as key
+      setQuantities((prev) => ({
+        ...prev,
+        [ticket.name.toLowerCase()]: 0, // Initialize quantity for each ticket type
+      }));
+    });
+    setTicketPrices(prices);
+  }, [tickets]);
+
+  // Calculate the total price whenever quantities or prices change
+  useEffect(() => {
+    const total = tickets.reduce((acc, ticket) => {
+      const ticketName = ticket.name.toLowerCase();
+      return (
+        acc + (ticketPrices[ticketName] || 0) * (quantities[ticketName] || 0)
+      );
+    }, 0);
+    setTotalPrice(total);
+  }, [quantities, ticketPrices, tickets]);
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
 
-  const handlePremiumQuantityChange = (event) => {
-    setPremiumQuantity(Number(event.target.value));
-  };
-
-  const handleStandardQuantityChange = (event) => {
-    setStandardQuantity(Number(event.target.value));
+  // Handle quantity changes for both ticket types
+  const handleQuantityChange = (ticket) => (event) => {
+    const value = Number(event.target.value);
+    setQuantities((prev) => ({
+      ...prev,
+      [ticket.name.toLowerCase()]: value, // Update only the selected ticket's quantity
+    }));
   };
 
   return (
-    <>
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg shadow-lg lg:w-[70%] md:w-[80%]  w-[95%] py-6  px-3 relative border border-gray-300 transition-all duration-300 ease-in-out transform hover:scale-105">
-            <button
-              onClick={handleCloseModal}
-              className="absolute top-3 right-3 text-gray-800 hover:text-red-500 transition"
+    <div className="bg-white rounded-lg relative border border-gray-300 p-3">
+      <h2 className="text-[15px] md:text-[16px] lg:md:text-[18px] text-black/70 font-bold mb-4 text-center">
+        Tickets
+      </h2>
+
+      {/* Tickets */}
+      <div className="grid grid-cols-1 md:grid-cols-2  gap-4">
+        {tickets.map((ticket) => {
+          // Define dynamic background color based on ticket type
+          const bgColor =
+            ticket.name === "VIP TICKET" ? "bg-[#0077ff]"
+            : ticket.name === "STANDARD TICKET" ? "bg-[#aec8ff]"
+            : "bg-[#7d3100]";
+
+          // Shortened ticket type
+          const shortenedName =
+            ticket.name === "VIP TICKET" ? "VIP"
+            : ticket.name === "STANDARD TICKET" ? "Standard"
+            : ticket.name;
+
+          return (
+            <div
+              key={ticket.uid}
+              className=" border border-gray-200 rounded-lg  flex flex-col justify-between shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out "
             >
-              <FaTimes />
-            </button>
-            <h2 className="text-[15px] md:text-[18px]  font-bold mb-4  text-center">
-              Tickets
-            </h2>
-
-            {/* Premium Ticket */}
-            <div className="mb-4 border-b pb-4 flex justify-center xl:gap-[13rem] lg:gap-[10rem] md:gap-[9rem] sm:gap-[8rem] gap-[4rem]">
-              <div className="flex flex-col">
-                <p className="text-[12px] md:text-[13px]">Ticket type </p>
-                <h3 className="sm:text-[15px] text-[13px] md:text-[18px] font-normal flex flex-shrink-0">
-                  Premium Ticket
-                </h3>
-                <p className="text-gray-600 text-[11px] md:text-[12px] mb-2">
-                  More info
-                </p>
-              </div>
-
-              <div className="flex flex-col">
-                <p className="text-[12px] md:text-[13px]">Price </p>
-                <p className="sm:text-[15px] md:text-[18px] text-[13px] font-normal">
-                  Price: ${ticketPrices.premium}
-                </p>
-              </div>
-
-              <div className="flex flex-col">
-                <label htmlFor="premiumQuantity" className="mb-1">
-                  <p className="text-[12px] md:text-[13px]"> Quantity</p>
-                </label>
-
-                <select
-                  id="premiumQuantity"
-                  value={premiumQuantity}
-                  onChange={handlePremiumQuantityChange}
-                  className="border rounded p-2 mb-4 text-[12px] md:text-[13px]"
-                >
-                  {[0, 1, 2, 3, 4, 5].map((quantity) => (
-                    <option key={quantity} value={quantity}>
-                      {quantity}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Standard Ticket */}
-
-            <div className="mb-4 border-b pb-4 flex justify-center xl:gap-[13rem] lg:gap-[10rem] md:gap-[9rem] sm:gap-[8rem] gap-[4rem]">
-              <div className="flex flex-col">
-                <p className="text-[12px] md:text-[13px]">Ticket type </p>
-                <h3 className="sm:text-[15px] text-[13px] md:text-[18px] font-normal flex flex-shrink-0">
-                  Standard Ticket
-                </h3>
-                <p className="text-gray-600 text-[12px] mb-2">More info</p>
-              </div>
-
-              <div className="flex flex-col">
-                <p className="text-[12px] md:text-[13px]">Price </p>
-                <p className="sm:text-[15px] text-[13px] md:text-[18px] font-normal">
-                  Price: ${ticketPrices.standard}
-                </p>
-              </div>
-
-              <div className="flex flex-col">
-                <label htmlFor="premiumQuantity" className="mb-1">
-                  <p className="text-[12px] md:text-[13px]"> Quantity</p>
-                </label>
-
-                <select
-                  id="standardQuantity"
-                  value={standardQuantity}
-                  onChange={handleStandardQuantityChange}
-                  className="border rounded p-2 mb-4 text-[12px] md:text-[13px]"
-                >
-                  {[0, 1, 2, 3, 4, 5, 6].map((quantity) => (
-                    <option key={quantity} value={quantity}>
-                      {quantity}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Total */}
-            <p className="text-[15px] md:text-[18px]  font-bold mb-4 text-center">
-              Total: ${totalPrice.toFixed(2)}
-            </p>
-
-            <div className="flex justify-between">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                transition={{ duration: 0.3 }}
-                whileTap={{ scale: 0.85 }}
+              <div
+                className={`${bgColor}  flex-grow mb-2 rounded-lg items-center flex flex-col p-2 text-white`}
               >
-                <button
-                  onClick={handleCloseModal}
-                  className=" text-[11px] md:text-[14px]    bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition"
-                >
-                  Cancel
-                </button>
-              </motion.button>
-              <Link to="/purchaseticket">
-                <motion.button
-                  className={`bg-green-600 text-[12px] md:text-[14px] text-white py-2 px-4 rounded hover:bg-green-700  transition ${
-                    premiumQuantity === 0 && standardQuantity === 0 ?
-                      "bg-gray-400 cursor-not-allowed"
-                    : "bg-green-600 hover:bg-green-700 text-white"
-                  }`}
-                  disabled={premiumQuantity === 0 && standardQuantity === 0}
-                  n
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ duration: 0.3 }}
-                  whileTap={{ scale: 0.85 }}
-                >
-                  Checkout
-                </motion.button>
-              </Link>
+                <p className="text-[13px] md:text-[15px] lg:text-[16px]   font-semibold">
+                  Ticket Type
+                </p>
+                <h3 className="text-white text-[14px] uppercase md:text-[13px] font-medium my-1">
+                  {ticket.name}
+                </h3>
+              </div>
+
+              {/* Price */}
+              <div className="px-2 py-[1.5rem] ">
+                <div className="flex  justify-between items-center mb-2">
+                  <p className="text-[13px] md:text-[15px] lg:text-[16px] text-gray-500 font-semibold">
+                    Price
+                  </p>
+                  <p className="text-black/70 text-[14px] md:text-[15px] font-semibold">
+                    {ticket.currencyCode} {ticket.price.toFixed(2)}
+                  </p>
+                </div>
+
+                {/* Available Tickets */}
+                <div className="flex  justify-between items-center mb-2">
+                  <p className="text-[13px] md:text-[15px] lg:text-[16px] text-gray-500 font-semibold">
+                    Available Tickets
+                  </p>
+                  <p className="text-gray-800 text-[14px] md:text-[15px] font-normal">
+                    {ticket.availableTickets}
+                  </p>
+                </div>
+
+                {/* Quantity Selector */}
+                <div className="flex flex-col">
+                  <label
+                    htmlFor={`quantity-${ticket.uid}`}
+                    className="mb-1 text-[13px] md:text-[15px] lg:text-[16px] text-gray-500"
+                  >
+                    Quantity
+                  </label>
+                  <select
+                    id={`quantity-${ticket.uid}`}
+                    value={quantities[ticket.name.toLowerCase()] || 0}
+                    onChange={handleQuantityChange(ticket)}
+                    className="border rounded-md p-2 text-[13px] md:text-[15px] lg:text-[16px] text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+                  >
+                    {[0, 1, 2, 3, 4, 5, 6].map((quantity) => (
+                      <option key={quantity} value={quantity}>
+                        {quantity}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
-    </>
+          );
+        })}
+      </div>
+
+      {/* Total */}
+      <p className="text-[15px] md:text-[16px] lg:md:text-[18px] text-black/70 mt-[2rem] font-bold mb-4 text-center">
+        Total: {tickets.length > 0 ? tickets[0].currencyCode : "USD"}{" "}
+        {totalPrice.toFixed(2)}
+      </p>
+
+      <div className="flex justify-between">
+        <div></div>
+        <Link to="/purchaseticket">
+          <motion.button
+            className={`text-[12px] md:text-[14px] text-white py-2 px-8 rounded hover:bg-green-700 transition ${
+              (
+                Object.values(quantities).reduce((acc, qty) => acc + qty, 0) ===
+                0
+              ) ?
+                "bg-gray-400 cursor-not-allowed"
+              : "bg-green-600 hover:bg-green-700"
+            }`}
+            disabled={
+              Object.values(quantities).reduce((acc, qty) => acc + qty, 0) === 0
+            }
+            whileHover={{ scale: 1.1 }}
+            transition={{ duration: 0.3 }}
+            whileTap={{ scale: 0.85 }}
+          >
+            Book
+          </motion.button>
+        </Link>
+      </div>
+    </div>
   );
 }
 

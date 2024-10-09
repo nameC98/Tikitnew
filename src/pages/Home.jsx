@@ -167,6 +167,7 @@ function Home() {
                   boxShadow: "0px 10px 15px rgba(0, 0, 0, 0.2)",
                 }}
                 transition={{ duration: 0.3 }}
+                key={event.id}
               >
                 <img
                   src={`${baseImageUrl}?fileName=${event.imageFileName}`}
@@ -191,10 +192,11 @@ function Home() {
                     From $10
                   </p>
 
-                  {loading[event.uid] ? ( // Check if the specific button is loading
+                  {(
+                    loading[event.uid] // Check if the specific button is loading
+                  ) ?
                     <Loader />
-                  ) : (
-                    <Link
+                  : <Link
                       to={`geteventid/${event.uid}`}
                       onClick={() => handleBookNowClick(event.uid)}
                     >
@@ -207,7 +209,7 @@ function Home() {
                         Book Now
                       </motion.button>
                     </Link>
-                  )}
+                  }
                 </div>
               </motion.div>
             </div>

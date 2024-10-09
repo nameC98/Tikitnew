@@ -10,7 +10,7 @@ function Navbar({ isSidebarOpen, toggleSidebar }) {
     <>
       {" "}
       {/* Top Navigation  */}
-      <nav className="w-[90%] m-auto md:block hidden">
+      <nav className=" m-auto md:block hidden border-[1px] border-b-gray-200">
         <div className="w-full px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center lg:gap-[5rem] md:gap-[2rem] gap-[2rem]">
           <Link to="/">
             <img
@@ -73,11 +73,9 @@ function Navbar({ isSidebarOpen, toggleSidebar }) {
       <nav className="w-[90%] m-auto md:hidden flex justify-between items-center py-4 z-50">
         <img src={logo} alt="logo" className="h-[3rem]" />
         <button onClick={toggleSidebar}>
-          {isSidebarOpen ? (
+          {isSidebarOpen ?
             <AiOutlineClose className="text-3xl" />
-          ) : (
-            <AiOutlineMenu className="text-3xl" />
-          )}
+          : <AiOutlineMenu className="text-3xl" />}
         </button>
       </nav>
     </>
