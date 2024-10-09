@@ -93,7 +93,9 @@ function PopupCartBar({
                     Price
                   </p>
                   <p className="text-black/70 text-[14px] lg:text-[15px] md:text-[13px] font-semibold">
-                    {ticket.currencyCode} {ticket.price.toFixed(2)}
+                    {ticket.price > 0 ?
+                      <p className="ticket-price">Price: ${ticket.price}</p>
+                    : <p className="ticket-free">Free</p>}
                   </p>
                 </div>
 

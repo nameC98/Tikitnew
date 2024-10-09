@@ -169,38 +169,38 @@ function Home() {
                 transition={{ duration: 0.3 }}
                 key={event.id}
               >
-                <img
-                  src={`${baseImageUrl}?fileName=${event.imageFileName}`}
-                  alt="Event"
-                  className="w-[20rem] h-[15rem] object-cover"
-                />
-                <div className="p-3">
-                  <div className="flex justify-between">
-                    <div>
-                      <h3 className="text-sm text-green-600">{event.date}</h3>
-                      <h2 className="font-bold text-lg text-black/80 sm:text-[14px] text-[12.8px]">
-                        {event.name}
-                      </h2>
+                <Link
+                  to={`geteventid/${event.uid}`}
+                  onClick={() => handleBookNowClick(event.uid)}
+                >
+                  <img
+                    src={`${baseImageUrl}?fileName=${event.imageFileName}`}
+                    alt="Event"
+                    className="w-[20rem] h-[15rem] object-cover"
+                  />
+                  <div className="p-3">
+                    <div className="flex justify-between">
+                      <div>
+                        <h3 className="text-sm text-green-600">{event.date}</h3>
+                        <h2 className="font-bold text-lg text-black/80 sm:text-[14px] text-[12.8px]">
+                          {event.name}
+                        </h2>
+                      </div>
+                      <div>
+                        <h3 className="sm:text-[12px] text-[12.8px] flex flex-shrink-0 text-green-600">
+                          {event.eventType.name}
+                        </h3>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="sm:text-[12px] text-[12.8px] flex flex-shrink-0 text-green-600">
-                        {event.eventType.name}
-                      </h3>
-                    </div>
-                  </div>
-                  <p className="font-bold text-lg sm:text-[14px] text-[12.8px] text-black/80">
-                    From $10
-                  </p>
+                    <p className="font-bold text-lg sm:text-[14px] text-[12.8px] text-black/80">
+                      From $10
+                    </p>
 
-                  {(
-                    loading[event.uid] // Check if the specific button is loading
-                  ) ?
-                    <Loader />
-                  : <Link
-                      to={`geteventid/${event.uid}`}
-                      onClick={() => handleBookNowClick(event.uid)}
-                    >
-                      <motion.button
+                    {(
+                      loading[event.uid] // Check if the specific button is loading
+                    ) ?
+                      <Loader />
+                    : <motion.button
                         className="mt-4 bg-green-500 text-white px-4 sm:text-[14px] text-[13px] py-2 rounded-3xl w-full"
                         whileHover={{ scale: 1.1, backgroundColor: "#38b2ac" }}
                         transition={{ duration: 0.3 }}
@@ -208,9 +208,9 @@ function Home() {
                       >
                         Book Now
                       </motion.button>
-                    </Link>
-                  }
-                </div>
+                    }
+                  </div>
+                </Link>
               </motion.div>
             </div>
           ))}

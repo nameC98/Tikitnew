@@ -15,7 +15,7 @@ export const loader = async ({ params }) => {
       `https://api.tikiti.co.zw/opn/v1/events/${params.id}`
     );
     const ticketResponse = await axios.get(
-      `https://api.tikiti.co.zw/opn/v1/events/01J99SJ99639D64HSKQZ5483WP/ticket-types`
+      `https://api.tikiti.co.zw/opn/v1/events/${params.id}/ticket-types`
     );
 
     return { selectedEvent: eventResponse.data, tickets: ticketResponse.data };
@@ -98,6 +98,7 @@ function GetEventID() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   console.log(selectedEvent);
+  console.log(tickets);
 
   return (
     <>
@@ -202,12 +203,6 @@ function GetEventID() {
                     Zimpraise
                   </p>
                 </div>
-                <div className="border border-green-500 flex items-center gap-3 p-2">
-                  <FaTicketAlt className="text-green-500 text-[1rem] md:text-[1.2rem]" />
-                  <p className="font-bold text-red-500">
-                    Only 20 tickets left!
-                  </p>
-                </div>
               </div>
 
               {/* Description */}
@@ -221,20 +216,19 @@ function GetEventID() {
               </div>
             </div>
 
-            {/* Right Section - Event Info */}
-            <div className="space-y-4   md:overflow-auto">
-              {/* Event Info */}
-
-              {/* Ticket Info */}
-              <PopupCartBar
-                isModalOpen={isModalOpen}
-                setIsModalOpen={setIsModalOpen}
-                totalPrice={totalPrice}
-                tickets={tickets}
-                selectedEvent={selectedEvent}
-                baseImageUrl={baseImageUrl}
-              />
-            </div>
+            {tickets?.length > 0 ?
+              <div className="space-y-4 md:overflow-auto">
+                <PopupCartBar
+                  isModalOpen={isModalOpen}
+                  setIsModalOpen={setIsModalOpen}
+                  totalPrice={totalPrice}
+                  tickets={tickets}
+                  selectedEvent={selectedEvent}
+                  baseImageUrl={baseImageUrl}
+                />
+              </div>
+            : <p className=" flex justify-center mt-10">No tickets available</p>
+            }
           </div>
         </div>
 
