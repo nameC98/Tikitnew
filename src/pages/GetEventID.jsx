@@ -21,7 +21,7 @@ export const loader = async ({ params }) => {
     return { selectedEvent: eventResponse.data, tickets: ticketResponse.data };
     return data;
   } catch (error) {
-    return redirect("/explore");
+    return redirect("/");
   }
 };
 
@@ -59,6 +59,7 @@ function GetEventID() {
   }, []);
 
   const { selectedEvent, tickets } = useLoaderData();
+  const eventId = selectedEvent.uid;
   const baseImageUrl = "https://api.tikiti.co.zw/opn/v1/files";
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -98,7 +99,8 @@ function GetEventID() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   console.log(selectedEvent);
-  console.log(tickets);
+
+  console.log(eventId);
 
   return (
     <>
@@ -225,6 +227,7 @@ function GetEventID() {
                   tickets={tickets}
                   selectedEvent={selectedEvent}
                   baseImageUrl={baseImageUrl}
+                  eventId={eventId}
                 />
               </div>
             : <p className=" flex justify-center mt-10">No tickets available</p>

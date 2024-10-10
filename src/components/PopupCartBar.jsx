@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function PopupCartBar({
   isModalOpen,
   setIsModalOpen,
   tickets, // Array of ticket objects from the database
+  eventId, // Add eventId to props
 }) {
   const [totalPrice, setTotalPrice] = useState(0);
   const [ticketPrices, setTicketPrices] = useState({});
   const [quantities, setQuantities] = useState({});
+  const navigate = useNavigate(); // Initialize useNavigate
+  console.log(eventId);
 
   // Initialize ticketPrices from tickets array
   useEffect(() => {
@@ -49,6 +52,30 @@ function PopupCartBar({
     }));
   };
 
+  // Handle booking button click
+  const handleBook = () => {
+    const bookedTickets = tickets
+      .map((ticket) => ({
+        ...ticket,
+        quantity: quantities[ticket.name.toLowerCase()] || 0,
+      }))
+      .filter((ticket) => ticket.quantity > 0);
+
+    // Debugging output
+    console.log("Booked Tickets:", bookedTickets);
+    console.log("Total Price:", totalPrice);
+
+    // Check if bookedTickets is not empty before navigating
+    if (bookedTickets.length > 0) {
+      navigate(`/checkoutpage/${eventId}`, {
+        state: { bookedTickets, totalPrice },
+      });
+      handleCloseModal();
+    } else {
+      alert("Please select at least one ticket to book.");
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg relative border border-gray-300 p-3">
       <h2 className="text-[15px] md:text-[16px] lg:md:text-[18px] text-black/70 font-bold mb-4 text-center">
@@ -56,15 +83,13 @@ function PopupCartBar({
       </h2>
 
       {/* Tickets */}
-      <div className="grid grid-cols-1 md:grid-cols-2  gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {tickets.map((ticket) => {
-          // Define dynamic background color based on ticket type
           const bgColor =
             ticket.name === "VIP TICKET" ? "bg-[#0077ff]"
             : ticket.name === "STANDARD TICKET" ? "bg-[#aec8ff]"
             : "bg-[#7d3100]";
 
-          // Shortened ticket type
           const shortenedName =
             ticket.name === "VIP TICKET" ? "VIP"
             : ticket.name === "STANDARD TICKET" ? "Standard"
@@ -73,12 +98,12 @@ function PopupCartBar({
           return (
             <div
               key={ticket.uid}
-              className=" border border-gray-200 rounded-lg  flex flex-col justify-between shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out "
+              className="border border-gray-200 rounded-lg flex flex-col justify-between shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out "
             >
               <div
-                className={`${bgColor}  flex-grow mb-2 rounded-lg items-center flex flex-col p-2 text-white`}
+                className={`${bgColor} flex-grow mb-2 rounded-lg items-center flex flex-col p-2 text-white`}
               >
-                <p className="text-[13px] md:text-[15px] lg:text-[16px]   font-semibold">
+                <p className="text-[13px] md:text-[15px] lg:text-[16px] font-semibold">
                   Ticket Type
                 </p>
                 <h3 className="text-white text-[14px] uppercase md:text-[13px] font-medium my-1">
@@ -88,7 +113,7 @@ function PopupCartBar({
 
               {/* Price */}
               <div className="px-2 py-[1.5rem] ">
-                <div className="flex  justify-between items-center mb-2">
+                <div className="flex justify-between items-center mb-2">
                   <p className="text-[13px] md:text-[13px] lg:text-[16px] text-gray-500 font-semibold">
                     Price
                   </p>
@@ -100,7 +125,7 @@ function PopupCartBar({
                 </div>
 
                 {/* Available Tickets */}
-                <div className="flex  justify-between items-center mb-2">
+                <div className="flex justify-between items-center mb-2">
                   <p className="text-[13px] md:text-[13px] lg:text-[16px] text-gray-500 font-semibold">
                     Available Tickets
                   </p>
@@ -144,7 +169,6 @@ function PopupCartBar({
 
       <div className="flex justify-between">
         <div></div>
-        {/* <Link to="/purchaseticket"> */}
         <motion.button
           className={`text-[12px] md:text-[14px] text-white py-2 px-8 rounded hover:bg-green-700 transition ${
             Object.values(quantities).reduce((acc, qty) => acc + qty, 0) === 0 ?
@@ -154,13 +178,13 @@ function PopupCartBar({
           disabled={
             Object.values(quantities).reduce((acc, qty) => acc + qty, 0) === 0
           }
+          onClick={handleBook} // Use handleBook for button click
           whileHover={{ scale: 1.1 }}
           transition={{ duration: 0.3 }}
           whileTap={{ scale: 0.85 }}
         >
           Book
         </motion.button>
-        {/* </Link> */}
       </div>
     </div>
   );
