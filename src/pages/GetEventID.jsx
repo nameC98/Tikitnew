@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
-
 import Footer from "../components/Footer";
 import axios from "axios";
 import { redirect, useLoaderData } from "react-router-dom";
@@ -91,9 +90,9 @@ function GetEventID() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  console.log(selectedEvent);
+  console.log(tickets);
 
-  console.log(eventId);
+  // console.log(eventId);
 
   return (
     <>

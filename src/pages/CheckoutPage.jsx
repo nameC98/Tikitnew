@@ -14,7 +14,6 @@ function CheckoutPage() {
   const [openTicketTypes, setOpenTicketTypes] = useState({});
   const [updatedBookedTickets, setUpdatedBookedTickets] =
     useState(bookedTickets);
-
   const [registrationFields, setRegistrationFields] = useState(null);
 
   useEffect(() => {
@@ -37,17 +36,6 @@ function CheckoutPage() {
     fetchEventData();
   }, [eventId]);
 
-  // if (!updatedBookedTickets.length) {
-  //   return (
-  //     <div className="checkout-container text-center p-6">
-  //       <h1 className="text-2xl font-bold mb-4">No tickets booked</h1>
-  //       <Link to="/" className="text-blue-500 underline">
-  //         Go back to event selection
-  //       </Link>
-  //     </div>
-  //   );
-  // }
-
   // Handle input change
   const handleInputChange = (ticketType, index, field, value) => {
     setTicketHolders((prev) => ({
@@ -57,20 +45,6 @@ function CheckoutPage() {
         [index]: {
           ...prev[ticketType]?.[index],
           [field]: value,
-        },
-      },
-    }));
-  };
-
-  // Handle file input change
-  const handleFileChange = (ticketType, index, file) => {
-    setTicketHolders((prev) => ({
-      ...prev,
-      [ticketType]: {
-        ...prev[ticketType],
-        [index]: {
-          ...prev[ticketType]?.[index],
-          file,
         },
       },
     }));
@@ -97,6 +71,31 @@ function CheckoutPage() {
         )
         .filter((ticket) => ticket.quantity > 0)
     );
+  };
+
+  // Handle adding a ticket holder
+  const handleAddTicketHolder = (ticketType) => {
+    // Increment the ticket quantity for the corresponding ticket type
+    setUpdatedBookedTickets((prevTickets) =>
+      prevTickets.map((ticket) =>
+        ticket.name === ticketType ?
+          { ...ticket, quantity: ticket.quantity + 1 }
+        : ticket
+      )
+    );
+
+    // Add a new ticket holder for the added ticket
+    setTicketHolders((prev) => ({
+      ...prev,
+      [ticketType]: {
+        ...prev[ticketType],
+        [Object.keys(prev[ticketType] || {}).length]: {
+          name: "",
+          lastName: "",
+          email: "",
+        },
+      },
+    }));
   };
 
   // Calculate the total remaining tickets
@@ -150,7 +149,7 @@ function CheckoutPage() {
 
           <div className="checkout-container max-w-4xl p-6 bg-white rounded-lg overflow-auto h-[80vh]">
             <div className="flex justify-center items-center">
-              <div className="flex flex-col">
+              <div className="flex flex-col gap-5">
                 <ul className="space-y-4">
                   {updatedBookedTickets.map((ticket, ticketIndex) => (
                     <li
@@ -159,22 +158,30 @@ function CheckoutPage() {
                     >
                       <div className="flex justify-between gap-[2rem] items-center">
                         <div className="font-semibold">{ticket.name}</div>
-                        <button
-                          onClick={() => toggleTicketType(ticket.name)}
-                          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                        >
-                          {openTicketTypes[ticket.name] ?
-                            "Hide Details"
-                          : "Show Details"}
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => toggleTicketType(ticket.name)}
+                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                          >
+                            {openTicketTypes[ticket.name] ?
+                              "Hide Details"
+                            : "Show Details"}
+                          </button>
+                          <button
+                            onClick={() => handleAddTicketHolder(ticket.name)}
+                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
+                          >
+                            Add
+                          </button>
+                        </div>
                       </div>
                       {openTicketTypes[ticket.name] && (
-                        <div className="mt-4 ">
+                        <div className="mt-4">
                           {Array.from({ length: ticket.quantity }).map(
                             (_, index) => (
                               <div
                                 key={index}
-                                className="flex gap-5 border py-2 px-5 rounded-md  "
+                                className="flex gap-5 border py-2 px-5 rounded-md"
                               >
                                 {/* Name Field */}
                                 <label className=" mb-1 block gap-1">
@@ -246,7 +253,7 @@ function CheckoutPage() {
                                   onClick={() =>
                                     handleRemoveTicketHolder(ticket.name, index)
                                   }
-                                  className="bg-red-500 text-white rounded px-1 "
+                                  className="bg-red-500 text-white rounded px-1"
                                 >
                                   Remove
                                 </button>
@@ -258,25 +265,22 @@ function CheckoutPage() {
                     </li>
                   ))}
                 </ul>
-                <div className="flex justify-between items-center  mt-6">
-                  <div className="text-lg font-semibold text-green-500 ">
+                <div className="flex justify-between items-center mt-6">
+                  <div className="text-lg font-semibold text-green-500">
                     <span className="text-black">Tickets Remaining:</span>{" "}
                     {calculateTotalRemaining()}{" "}
                   </div>
                   <div className="text-lg text-green-500 font-semibold">
-                    <span className="text-black"> Total Price:</span> $
+                    <span className="text-black">Total Price:</span> $
                     {calculateTotalPrice()}{" "}
                   </div>
                 </div>
                 <div className="flex justify-center items-center">
                   <button
-                    className={
-                      updatedBookedTickets.length ?
-                        " py-2 px-10 mt-6 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                      : "py-2 px-10 mt-6 bg-gray-500 text-white rounded cursor-not-allowed transition"
-                    }
+                    className="text-lg px-8 py-2 bg-orange-500 text-white rounded-md"
+                    onClick={() => console.log("Proceed to Payment")}
                   >
-                    Buy
+                    Proceed to Payment
                   </button>
                 </div>
               </div>

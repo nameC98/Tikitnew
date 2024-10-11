@@ -2,13 +2,32 @@ import React, { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function PopupCartBar({ isModalOpen, setIsModalOpen, tickets, eventId }) {
   const [totalPrice, setTotalPrice] = useState(0);
   const [ticketPrices, setTicketPrices] = useState({});
   const [quantities, setQuantities] = useState({});
   const navigate = useNavigate();
-  console.log(eventId);
+  // console.log(eventId);
+
+  const [session, setSession] = useState();
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get(
+          "https://api.tikiti.co.zw/opn/v1/sessions/current-session"
+        );
+        setSession(response.data);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  console.log(session);
 
   // Initialize ticketPrices from tickets array
   useEffect(() => {
