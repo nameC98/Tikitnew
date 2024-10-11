@@ -10,10 +10,10 @@ function CheckoutPage() {
   const { bookedTickets = [], totalPrice = 0 } = location.state || {};
 
   const [eventDetails, setEventDetails] = useState(null);
-  const [ticketHolders, setTicketHolders] = useState({}); // Store ticket holder details
-  const [openTicketTypes, setOpenTicketTypes] = useState({}); // Track which ticket types are open
+  const [ticketHolders, setTicketHolders] = useState({});
+  const [openTicketTypes, setOpenTicketTypes] = useState({});
   const [updatedBookedTickets, setUpdatedBookedTickets] =
-    useState(bookedTickets); // Updated booked tickets
+    useState(bookedTickets);
 
   const [registrationFields, setRegistrationFields] = useState(null);
 
@@ -27,8 +27,8 @@ function CheckoutPage() {
           ),
         ]);
 
-        setEventDetails(eventResponse.data); // Store the fetched event details
-        setRegistrationFields(registrationResponse.data); // Store the registration fields
+        setEventDetails(eventResponse.data);
+        setRegistrationFields(registrationResponse.data);
       } catch (err) {
         console.log(err);
       }
@@ -88,15 +88,14 @@ function CheckoutPage() {
     });
 
     // Update the booked tickets state to reduce the quantity for the corresponding ticket type
-    setUpdatedBookedTickets(
-      (prevTickets) =>
-        prevTickets
-          .map((ticket) =>
-            ticket.name === ticketType && ticket.quantity > 0 ?
-              { ...ticket, quantity: ticket.quantity - 1 }
-            : ticket
-          )
-          .filter((ticket) => ticket.quantity > 0) // Remove ticket if quantity becomes zero
+    setUpdatedBookedTickets((prevTickets) =>
+      prevTickets
+        .map((ticket) =>
+          ticket.name === ticketType && ticket.quantity > 0 ?
+            { ...ticket, quantity: ticket.quantity - 1 }
+          : ticket
+        )
+        .filter((ticket) => ticket.quantity > 0)
     );
   };
 
@@ -186,7 +185,7 @@ function CheckoutPage() {
                                     value={
                                       ticketHolders[ticket.name]?.[index]
                                         ?.name || ""
-                                    } // Persisted value
+                                    }
                                     onChange={(e) =>
                                       handleInputChange(
                                         ticket.name,
@@ -208,7 +207,7 @@ function CheckoutPage() {
                                     value={
                                       ticketHolders[ticket.name]?.[index]
                                         ?.lastName || ""
-                                    } // Persisted value
+                                    }
                                     onChange={(e) =>
                                       handleInputChange(
                                         ticket.name,
@@ -230,7 +229,7 @@ function CheckoutPage() {
                                     value={
                                       ticketHolders[ticket.name]?.[index]
                                         ?.email || ""
-                                    } // Persisted value
+                                    }
                                     onChange={(e) =>
                                       handleInputChange(
                                         ticket.name,

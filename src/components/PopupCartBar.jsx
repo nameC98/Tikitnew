@@ -3,26 +3,21 @@ import { FaTimes } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
-function PopupCartBar({
-  isModalOpen,
-  setIsModalOpen,
-  tickets, // Array of ticket objects from the database
-  eventId, // Add eventId to props
-}) {
+function PopupCartBar({ isModalOpen, setIsModalOpen, tickets, eventId }) {
   const [totalPrice, setTotalPrice] = useState(0);
   const [ticketPrices, setTicketPrices] = useState({});
   const [quantities, setQuantities] = useState({});
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
   console.log(eventId);
 
   // Initialize ticketPrices from tickets array
   useEffect(() => {
     const prices = {};
     tickets.forEach((ticket) => {
-      prices[ticket.name.toLowerCase()] = ticket.price; // Use ticket name as key
+      prices[ticket.name.toLowerCase()] = ticket.price;
       setQuantities((prev) => ({
         ...prev,
-        [ticket.name.toLowerCase()]: 0, // Initialize quantity for each ticket type
+        [ticket.name.toLowerCase()]: 0,
       }));
     });
     setTicketPrices(prices);
@@ -48,7 +43,7 @@ function PopupCartBar({
     const value = Number(event.target.value);
     setQuantities((prev) => ({
       ...prev,
-      [ticket.name.toLowerCase()]: value, // Update only the selected ticket's quantity
+      [ticket.name.toLowerCase()]: value,
     }));
   };
 

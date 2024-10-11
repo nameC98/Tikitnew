@@ -12,11 +12,11 @@ function App() {
     {
       path: "/",
       element: <HomeLayout />,
-      // errorElement: <Error />, // Uncomment if you have an Error component
+      // errorElement: <Error />,
       children: [
         {
           index: true,
-          element: <Home />, // No need to specify path as it is the index route
+          element: <Home />,
           loader: homeloader,
         },
         {
@@ -29,7 +29,7 @@ function App() {
           element: <Purchaseticket />,
         },
         {
-          path: "checkoutpage/:eventId", // Ensure this matches how you use it
+          path: "checkoutpage/:eventId",
           element: <CheckoutPage />,
         },
       ],

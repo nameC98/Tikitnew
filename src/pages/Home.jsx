@@ -17,7 +17,7 @@ export const loader = async () => {
     const getsessions = await axios.get(
       "https://api.tikiti.co.zw/opn/v1/sessions/current-session"
     );
-    // console.log(data.content);
+
     return { getallevents: getevents.data, getsession: getsessions.data };
   } catch (error) {
     return redirect("/");
@@ -26,7 +26,7 @@ export const loader = async () => {
 
 function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768); // Track if on small screens
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   const [events, setEvents] = useState([]);
   const { getallevents, getsession } = useLoaderData();
@@ -38,7 +38,7 @@ function Home() {
         const response = await axios.get(
           "https://api.tikiti.co.zw/opn/v1/files"
         );
-        setEvents(response.data); // Assuming response data is an array of events
+        setEvents(response.data);
       } catch (error) {
         console.error("Error fetching events:", error);
       }
@@ -58,12 +58,12 @@ function Home() {
     setIsSidebarOpen(false);
   };
 
-  // Handle window resize to show/hide sidebar or topbar based on screen size
+  // Handle window resize to show/hide sidebar
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768); // Set mobile state based on screen width
+      setIsMobile(window.innerWidth <= 768);
       if (window.innerWidth > 768) {
-        setIsSidebarOpen(false); // Hide sidebar when resizing to larger screens
+        setIsSidebarOpen(false);
       }
     };
     window.addEventListener("resize", handleResize);
@@ -197,13 +197,7 @@ function Home() {
                       </div>
                     </div>
 
-                    {/* <p className="font-bold text-lg sm:text-[14px] text-[12.8px] text-black/80">
-                      From $10
-                    </p> */}
-
-                    {(
-                      loading[event.uid] // Check if the specific button is loading
-                    ) ?
+                    {loading[event.uid] ?
                       <Loader />
                     : <motion.button
                         className="mt-4 bg-green-500 text-white px-4 sm:text-[14px] text-[13px] py-2 rounded-3xl w-full"

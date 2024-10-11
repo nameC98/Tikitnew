@@ -4,26 +4,23 @@
 
 html,
 body {
-  overflow: auto; /* Ensure scrolling is enabled */
+  overflow: auto;
 }
 
 html {
   font-size: 16px;
 }
 
-/* Chrome, Safari, Opera */
 ::-webkit-scrollbar {
-  display: none; /* Hide scrollbar */
+  display: none;
 }
 
-/* Firefox */
 html {
-  scrollbar-width: none; /* Hide scrollbar */
+  scrollbar-width: none;
 }
 
-/* Internet Explorer 10+ */
 body {
-  -ms-overflow-style: none; /* Hide scrollbar */
+  -ms-overflow-style: none;
 }
 
 body {

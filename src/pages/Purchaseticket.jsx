@@ -20,7 +20,7 @@ const Purchaseticket = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    setError(""); // Clear error on input change
+    setError("");
   };
 
   const handleAddTicket = (index) => {

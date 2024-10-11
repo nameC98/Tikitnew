@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
-import { FaMapMarkerAlt, FaTicketAlt } from "react-icons/fa";
+
 import Footer from "../components/Footer";
 import axios from "axios";
-import { Link, redirect, useLoaderData } from "react-router-dom";
+import { redirect, useLoaderData } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
-import Loader from "../components/Loader";
-import { motion } from "framer-motion";
+
 import PopupCartBar from "../components/PopupCartBar";
 
 export const loader = async ({ params }) => {
@@ -77,12 +76,6 @@ function GetEventID() {
   const toggleClose = () => {
     setIsSidebarOpen(false);
   };
-
-  // const handlePurchaseClick = () => {
-  //   if (premiumQuantity > 0 || standardQuantity > 0) {
-  //     setIsModalOpen(true);
-  //   }
-  // };
 
   const handlePurchaseClick = () => {
     setIsModalOpen(true);
