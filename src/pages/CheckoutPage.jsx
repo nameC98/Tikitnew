@@ -169,15 +169,15 @@ function CheckoutPage() {
                         </button>
                       </div>
                       {openTicketTypes[ticket.name] && (
-                        <div className="mt-4 grid  sm:grid-cols-2 grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-[2rem] xl:grid-cols-4">
+                        <div className="mt-4 ">
                           {Array.from({ length: ticket.quantity }).map(
                             (_, index) => (
                               <div
                                 key={index}
-                                className="flex flex-col border py-2 px-5 rounded-md bg-gray-50 w-1/3 min-w-[200px]"
+                                className="flex gap-5 border py-2 px-5 rounded-md  "
                               >
                                 {/* Name Field */}
-                                <label className="block mb-1">
+                                <label className=" mb-1 block gap-1">
                                   Name:
                                   <input
                                     type="text"
@@ -246,7 +246,7 @@ function CheckoutPage() {
                                   onClick={() =>
                                     handleRemoveTicketHolder(ticket.name, index)
                                   }
-                                  className="bg-red-500 text-white rounded p-1 mt-2"
+                                  className="bg-red-500 text-white rounded px-1 "
                                 >
                                   Remove
                                 </button>
