@@ -37,16 +37,16 @@ function CheckoutPage() {
     fetchEventData();
   }, [eventId]);
 
-  if (!updatedBookedTickets.length) {
-    return (
-      <div className="checkout-container text-center p-6">
-        <h1 className="text-2xl font-bold mb-4">No tickets booked</h1>
-        <Link to="/" className="text-blue-500 underline">
-          Go back to event selection
-        </Link>
-      </div>
-    );
-  }
+  // if (!updatedBookedTickets.length) {
+  //   return (
+  //     <div className="checkout-container text-center p-6">
+  //       <h1 className="text-2xl font-bold mb-4">No tickets booked</h1>
+  //       <Link to="/" className="text-blue-500 underline">
+  //         Go back to event selection
+  //       </Link>
+  //     </div>
+  //   );
+  // }
 
   // Handle input change
   const handleInputChange = (ticketType, index, field, value) => {
@@ -258,7 +258,7 @@ function CheckoutPage() {
                     </li>
                   ))}
                 </ul>
-                <div className="flex justify-between items-center mt-6">
+                <div className="flex justify-between items-center  mt-6">
                   <div className="text-lg font-semibold text-green-500 ">
                     <span className="text-black">Tickets Remaining:</span>{" "}
                     {calculateTotalRemaining()}{" "}
@@ -269,7 +269,13 @@ function CheckoutPage() {
                   </div>
                 </div>
                 <div className="flex justify-center items-center">
-                  <button className=" py-2 px-10 mt-6 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+                  <button
+                    className={
+                      updatedBookedTickets.length ?
+                        " py-2 px-10 mt-6 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                      : "py-2 px-10 mt-6 bg-gray-500 text-white rounded cursor-not-allowed transition"
+                    }
+                  >
                     Buy
                   </button>
                 </div>
