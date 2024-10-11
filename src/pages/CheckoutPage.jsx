@@ -184,7 +184,7 @@ function CheckoutPage() {
                                 className="flex gap-5 border py-2 px-5 rounded-md"
                               >
                                 {/* Name Field */}
-                                <label className=" mb-1 block gap-1">
+                                <label className=" mb- block gap-1">
                                   Name:
                                   <input
                                     type="text"
