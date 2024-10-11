@@ -81,24 +81,12 @@ function PopupCartBar({ isModalOpen, setIsModalOpen, tickets, eventId }) {
         {/* Tickets */}
         <div className="grid gap-4 grid-cols-2 place-items-center">
           {tickets.map((ticket) => {
-            const bgColor =
-              ticket.name === "VIP TICKET" ? "bg-[#0077ff]"
-              : ticket.name === "STANDARD TICKET" ? "bg-[#aec8ff]"
-              : "bg-[#7d3100]";
-
-            const shortenedName =
-              ticket.name === "VIP TICKET" ? "VIP"
-              : ticket.name === "STANDARD TICKET" ? "Standard"
-              : ticket.name;
-
             return (
               <div
                 key={ticket.uid}
                 className="border border-gray-200 rounded-lg max-w-96 justify-between shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out "
               >
-                <div
-                  className={`${bgColor} flex-grow mb-2 rounded-lg items-center flex flex-col p-2 text-white`}
-                >
+                <div className="bg-black  flex-grow mb-2 rounded-lg items-center flex flex-col p-2 text-white">
                   <h3 className="text-white text-[14px] uppercase md:text-[13px] font-medium my-1">
                     {ticket.name}
                   </h3>
