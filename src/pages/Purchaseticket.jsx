@@ -10,11 +10,10 @@ const Purchaseticket = () => {
     email: "",
   });
 
-  const [eventData, setEventData] = useState({
-    eventType: "Concert", // example default value
-    ticketType: "General Admission", // example default value
-    totalPrice: 50, // example price
-  });
+  const [tickets, setTickets] = useState([
+    { type: "Premium Ticket", price: 50, quantity: 0 },
+    { type: "General Admission", price: 25, quantity: 0 },
+  ]);
 
   const [error, setError] = useState("");
 
@@ -22,6 +21,12 @@ const Purchaseticket = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     setError(""); // Clear error on input change
+  };
+
+  const handleAddTicket = (index) => {
+    const updatedTickets = [...tickets];
+    updatedTickets[index].quantity += 1;
+    setTickets(updatedTickets);
   };
 
   const handleBuy = () => {
@@ -37,7 +42,7 @@ const Purchaseticket = () => {
       return;
     }
 
-    console.log("Purchasing...", { formData, eventData });
+    console.log("Purchasing...", { formData, tickets });
   };
 
   const isFormComplete =
@@ -142,39 +147,56 @@ const Purchaseticket = () => {
                 </p>
               </div>
 
-              {/* Adjusted border section */}
-              <div className="flex justify-between border-t-2 border-b-2 border-white/40 py-2 mt-4">
-                {" "}
-                {/* Changed mt from 5rem to 4 for more appropriate spacing */}
-                <div className="flex-col flex ">
-                  <p className=" md:text-[16px] text-[15px]">Premium Ticket</p>
-                  <div className="flex justify-between">
-                    <p className="md:text-[16px] text-[15px]">Qty: 6</p>
-                    <div></div>
+              {/* Ticket Types Section */}
+              <div>
+                {tickets.map((ticket, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between border-t-2 border-b-2 border-white/40 py-2 mt-4"
+                  >
+                    <div className="flex-col flex ">
+                      <p className="md:text-[16px] text-[15px]">
+                        {ticket.type}
+                      </p>
+                      <div className="flex justify-between">
+                        <p className="md:text-[16px] text-[15px]">
+                          Qty: {ticket.quantity}
+                        </p>
+                        <button
+                          onClick={() => handleAddTicket(index)}
+                          className="bg-white text-green-500 py-1 px-3 rounded"
+                        >
+                          Add
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="md:text-[16px] text-[15px] font-bold">
+                        ${ticket.price}.00
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <p className="md:text-[16px] text-[15px] font-bold">
-                    $300.00
-                  </p>
-                </div>
+                ))}
               </div>
 
               <div className="flex justify-between">
                 <label className="block md:text-[16px] text-[15px] font-semibold">
                   Total:
                 </label>
-                <p className="md:text-[16px] text-[15px] font-bold">$300.00</p>
+                <p className="md:text-[16px] text-[15px] font-bold">
+                  $
+                  {tickets.reduce(
+                    (total, ticket) => total + ticket.price * ticket.quantity,
+                    0
+                  )}
+                  .00
+                </p>
               </div>
             </div>
 
             <button
               onClick={handleBuy}
-              className={`mt-6 ${
-                isFormComplete ?
-                  "bg-green-700 hover:bg-green-700"
-                : "bg-gray-400"
-              } text-white py-2 px-4 rounded-lg transition duration-300 w-full`}
+              className={`mt-6 ${isFormComplete ? "bg-green-700 hover:bg-green-700" : "bg-gray-400"} text-white py-2 px-4 rounded-lg transition duration-300 w-full`}
             >
               Buy
             </button>

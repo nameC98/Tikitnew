@@ -116,44 +116,6 @@ function GetEventID() {
 
         <div className="w-[95%]  mt-[3rem] m-auto">
           {" "}
-          {/* <h1 className="text-[15px] md:text-[18px] lg:md:text-[19px] font-bold text-black/70">
-            {selectedEvent.name}
-          </h1> */}
-          {/* <div className="w-full bg-white  overflow-hidden">
-            <div className="flex   gap-[3rem] ">
-              <h2 className="text-[15px] md:text-[18px] lg:md:text-[19px] font-semibold text-gray-600 ">
-                {selectedEvent.name}
-              </h2>
-              <div className=" flex gap-[3rem]">
-                <div className="flex flex-col ">
-                  <p className="text-[15px] md:text-[16px] lg:md:text-[18px]">
-                    Location
-                  </p>
-                  <div className="flex gap-1 ">
-                    <FaMapMarkerAlt className="text-green-500" />
-                    <p className="text-gray-600 ">
-                      {selectedEvent.location.description}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex flex-col border-l border-r border-gray-200 px-5">
-                  <p className="text-green-500 font-bold uppercase   text-[15px] md:text-[16px] lg:md:text-[18px]">
-                    Date
-                  </p>
-                  <p className="text-gray-600   md:text-[15px] text-[13px]">
-                    {selectedEvent.date}
-                  </p>
-                </div>
-
-                <div className="flex flex-col ">
-                  <p className="text-green-500 text-[15px] md:text-[16px] lg:md:text-[18px] font-bold uppercase">
-                    Start Time
-                  </p>
-                  {selectedEvent.time}
-                </div>
-              </div>
-            </div>
-          </div> */}
           <div className="flex flex-col md:flex-row md:space-x-5 w-full">
             {/* Event Card */}
             <div className="border rounded-lg shadow-sm mt-5 md:mt-0 p-3 bg-white flex-1 min-w-0 h-full">

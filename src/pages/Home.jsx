@@ -11,11 +11,14 @@ import Loader from "../components/Loader";
 
 export const loader = async () => {
   try {
-    const { data } = await axios.get(
+    const getevents = await axios.get(
       "https://api.tikiti.co.zw/opn/v1/events/active"
     );
+    const getsessions = await axios.get(
+      "https://api.tikiti.co.zw/opn/v1/sessions/current-session"
+    );
     // console.log(data.content);
-    return data;
+    return { getallevents: getevents.data, getsession: getsessions.data };
   } catch (error) {
     return redirect("/");
   }
@@ -26,7 +29,8 @@ function Home() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768); // Track if on small screens
 
   const [events, setEvents] = useState([]);
-  const allevents = useLoaderData();
+  const { getallevents, getsession } = useLoaderData();
+  console.log(getsession);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -68,7 +72,7 @@ function Home() {
 
   const baseImageUrl = "https://api.tikiti.co.zw/opn/v1/files";
 
-  console.log(allevents);
+  console.log(getallevents);
 
   const [loading, setLoading] = useState(false);
 
@@ -158,7 +162,7 @@ function Home() {
           }}
           className="grid  xl:px-[2rem] grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6"
         >
-          {allevents?.content?.map((event) => (
+          {getallevents?.content?.map((event) => (
             <div key={event.id}>
               <motion.div
                 className="border rounded-lg overflow-hidden shadow-sm bg-white"
