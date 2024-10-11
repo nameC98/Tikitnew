@@ -129,7 +129,7 @@ function PopupCartBar({ isModalOpen, setIsModalOpen, tickets, eventId }) {
                       id={`quantity-${ticket.uid}`}
                       value={quantities[ticket.name.toLowerCase()] || 0}
                       onChange={handleQuantityChange(ticket)}
-                      className="border rounded-md p-2 text-[13px] md:text-[15px]  lg:text-[16px] text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+                      className="border rounded-md  text-[13px] md:text-[15px]  lg:text-[16px] text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
                     >
                       {[0, 1, 2, 3, 4, 5, 6].map((quantity) => (
                         <option key={quantity} value={quantity}>
