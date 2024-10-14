@@ -1,13 +1,19 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useLocation, useParams, Link } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 function CheckoutPage() {
   const location = useLocation();
-  const { eventId } = useParams(); // Get eventId from URL
-  const { bookedTickets = [], totalPrice = 0 } = location.state || {};
+  const { eventId } = useParams();
+  const {
+    bookedTickets = [],
+    totalPrice = 0,
+    registrationId,
+  } = location.state || {};
+
+  console.log(registrationId);
 
   const [eventDetails, setEventDetails] = useState(null);
   const [ticketHolders, setTicketHolders] = useState({});
@@ -15,26 +21,44 @@ function CheckoutPage() {
   const [updatedBookedTickets, setUpdatedBookedTickets] =
     useState(bookedTickets);
   const [registrationFields, setRegistrationFields] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchEventData = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const [eventResponse, registrationResponse] = await Promise.all([
+        axios.get(`https://api.tikiti.co.zw/opn/v1/events/${eventId}`),
+        axios.get(
+          `https://api.tikiti.co.zw/opn/v1/event-types/${registrationId}/registration-fields`
+        ),
+      ]);
+
+      setEventDetails(eventResponse.data);
+      setRegistrationFields(registrationResponse.data);
+    } catch (err) {
+      setError("Failed to fetch data. Please try again.");
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchEventData = async () => {
-      try {
-        const [eventResponse, registrationResponse] = await Promise.all([
-          axios.get(`https://api.tikiti.co.zw/opn/v1/events/${eventId}`),
-          axios.get(
-            `https://api.tikiti.co.zw/opn/v1/event-types/${eventId}/registration-fields`
-          ),
-        ]);
-
-        setEventDetails(eventResponse.data);
-        setRegistrationFields(registrationResponse.data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
     fetchEventData();
-  }, [eventId]);
+  }, [eventId, registrationId]);
+
+  if (loading) {
+    return <p>Loading event data...</p>;
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
+
+  console.log(registrationFields);
 
   // Handle input change
   const handleInputChange = (ticketType, index, field, value) => {
@@ -114,20 +138,12 @@ function CheckoutPage() {
     );
   };
 
-  // Toggle visibility of ticket type input fields
-  const toggleTicketType = (ticketType) => {
-    setOpenTicketTypes((prev) => ({
-      ...prev,
-      [ticketType]: !prev[ticketType],
-    }));
-  };
-
   return (
     <>
       <Navbar />
       <div className="justify-center items-center flex-col">
         <div className="flex flex-col justify-center items-center mt-5 gap-1">
-          <h1 className="text-[20px]  lg:text-[23px] font-bold text-black/70">
+          <h1 className="text-[20px] lg:text-[23px] font-bold text-black/70">
             {eventDetails?.name}
           </h1>
           <h2 className="text-lg font-semibold text-black/70">Your Tickets:</h2>
@@ -160,14 +176,6 @@ function CheckoutPage() {
                         <div className="font-semibold">{ticket.name}</div>
                         <div className="flex gap-2">
                           <button
-                            onClick={() => toggleTicketType(ticket.name)}
-                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                          >
-                            {openTicketTypes[ticket.name] ?
-                              "Hide Details"
-                            : "Show Details"}
-                          </button>
-                          <button
                             onClick={() => handleAddTicketHolder(ticket.name)}
                             className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
                           >
@@ -175,93 +183,62 @@ function CheckoutPage() {
                           </button>
                         </div>
                       </div>
-                      {openTicketTypes[ticket.name] && (
-                        <div className="mt-4">
-                          {Array.from({ length: ticket.quantity }).map(
-                            (_, index) => (
-                              <div
-                                key={index}
-                                className="flex gap-5 border py-2 px-5 rounded-md"
-                              >
-                                {/* Name Field */}
-                                <label className=" mb- block gap-1">
-                                  Name:
-                                  <input
-                                    type="text"
-                                    placeholder="Enter Name"
-                                    value={
-                                      ticketHolders[ticket.name]?.[index]
-                                        ?.name || ""
-                                    }
-                                    onChange={(e) =>
-                                      handleInputChange(
-                                        ticket.name,
-                                        index,
-                                        "name",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="border border-gray-300 text-[13px] outline-none rounded-md p-1 w-full"
-                                  />
-                                </label>
 
-                                {/* Last Name Field */}
-                                <label className="block mb-1">
-                                  Last Name:
-                                  <input
-                                    type="text"
-                                    placeholder="Enter Last Name"
-                                    value={
-                                      ticketHolders[ticket.name]?.[index]
-                                        ?.lastName || ""
-                                    }
-                                    onChange={(e) =>
-                                      handleInputChange(
-                                        ticket.name,
-                                        index,
-                                        "lastName",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="border border-gray-300 text-[13px] outline-none rounded-md p-1 w-full"
-                                  />
-                                </label>
-
-                                {/* Email Field */}
-                                <label className="block mb-1">
-                                  Email Address:
-                                  <input
-                                    type="email"
-                                    placeholder="Enter Email"
-                                    value={
-                                      ticketHolders[ticket.name]?.[index]
-                                        ?.email || ""
-                                    }
-                                    onChange={(e) =>
-                                      handleInputChange(
-                                        ticket.name,
-                                        index,
-                                        "email",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="border border-gray-300 text-[13px] outline-none rounded-md p-1 w-full"
-                                  />
-                                </label>
-
+                      <div className="mt-4">
+                        {Array.from({ length: ticket.quantity }).map(
+                          (_, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center gap-5 mb-5 border py-2 px-5 rounded-md"
+                            >
+                              {(
+                                registrationFields &&
+                                registrationFields.length > 0
+                              ) ?
+                                registrationFields.map((field) => (
+                                  <label key={field.uid} className="block mb-1">
+                                    {field.displayName}:
+                                    <input
+                                      type={
+                                        field.fieldType === "TEXT" ?
+                                          "text"
+                                        : "email"
+                                      }
+                                      placeholder={`Enter ${field.displayName}`}
+                                      value={
+                                        ticketHolders[ticket.name]?.[index]?.[
+                                          field.name
+                                        ] || ""
+                                      }
+                                      onChange={(e) =>
+                                        handleInputChange(
+                                          ticket.name,
+                                          index,
+                                          field.name,
+                                          e.target.value
+                                        )
+                                      }
+                                      className="border border-gray-300 text-[13px] outline-none rounded-md p-1 w-full"
+                                      required={field.mandatory}
+                                    />
+                                  </label>
+                                ))
+                              : <p>No registration fields available.</p>}
+                              {/* Remove Button */}
+                              <div>
                                 <button
                                   onClick={() =>
                                     handleRemoveTicketHolder(ticket.name, index)
                                   }
-                                  className="bg-red-500 text-white rounded px-1"
+                                  className="bg-red-500  px-5 border text-[13px] outline-none rounded-md p-1 mt-5 w-full font-semibold text-white"
                                 >
                                   Remove
                                 </button>
                               </div>
-                            )
-                          )}
-                        </div>
-                      )}
+                            </div>
+                          )
+                        )}
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -280,7 +257,7 @@ function CheckoutPage() {
                     className="text-lg px-8 py-2 bg-orange-500 text-white rounded-md"
                     onClick={() => console.log("Proceed to Payment")}
                   >
-                    Proceed to Payment
+                    checkout
                   </button>
                 </div>
               </div>

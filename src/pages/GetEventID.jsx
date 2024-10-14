@@ -92,7 +92,7 @@ function GetEventID() {
   }, []);
   console.log(tickets);
 
-  // console.log(eventId);
+  console.log(selectedEvent);
 
   return (
     <>

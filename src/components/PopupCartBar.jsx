@@ -4,7 +4,13 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-function PopupCartBar({ isModalOpen, setIsModalOpen, tickets, eventId }) {
+function PopupCartBar({
+  isModalOpen,
+  setIsModalOpen,
+  tickets,
+  eventId,
+  selectedEvent,
+}) {
   const [totalPrice, setTotalPrice] = useState(0);
   const [ticketPrices, setTicketPrices] = useState({});
   const [quantities, setQuantities] = useState({});
@@ -76,13 +82,17 @@ function PopupCartBar({ isModalOpen, setIsModalOpen, tickets, eventId }) {
       .filter((ticket) => ticket.quantity > 0);
 
     // Debugging output
-    console.log("Booked Tickets:", bookedTickets);
-    console.log("Total Price:", totalPrice);
+    // console.log("Booked Tickets:", bookedTickets);
+    // console.log("Total Price:", totalPrice);
 
     // Check if bookedTickets is not empty before navigating
     if (bookedTickets.length > 0) {
       navigate(`/checkoutpage/${eventId}`, {
-        state: { bookedTickets, totalPrice },
+        state: {
+          bookedTickets,
+          totalPrice,
+          registrationId: selectedEvent?.eventType.uid,
+        },
       });
       handleCloseModal();
     } else {

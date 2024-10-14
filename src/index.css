@@ -12,11 +12,17 @@ html {
 }
 
 ::-webkit-scrollbar {
-  display: none;
+  width: 5px;
 }
 
-html {
-  scrollbar-width: none;
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: gray;
+  border-radius: 10px;
 }
 
 body {
