@@ -5,6 +5,8 @@ const ConfirmationPage = () => {
   const [orderDetails, setOrderDetails] = useState(null);
   const orderUid = new URLSearchParams(window.location.search).get("orderUid");
 
+  console.log(orderUid);
+
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {

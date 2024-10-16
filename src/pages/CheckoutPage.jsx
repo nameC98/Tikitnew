@@ -56,28 +56,27 @@ function CheckoutPage() {
       console.log("Checkout Success:", response.data);
       alert("Checkout successful!");
 
-      //  Get the Order UID
+      // Get the Order UID
       const orderUid = response.data?.orderNumber;
 
       if (orderUid) {
-        //Initiate Payment
+        // Initiate Payment with the specific return URL
         const paymentResponse = await axios.post(
           `https://api.tikiti.co.zw/opn/v1/orders/${orderUid}/initiate-payment`,
           {
             paymentMethod: "ONLINE",
-            returnUrl: "https://tikitnew.vercel.app",
+            returnUrl: "https://tikitnew.vercel.app/confirmationpage", // Set the return URL to your confirmation page
           },
           { headers: { "Content-Type": "application/json" } }
         );
 
         console.log("Payment Response:", paymentResponse.data);
 
-        //Check if paymentTransaction is null
         if (paymentResponse.data.paymentTransaction) {
           const paymentUrl =
             paymentResponse.data.paymentTransaction.redirectUrl;
           console.log("Redirecting to Payment URL:", paymentUrl);
-          window.location.href = paymentUrl;
+          window.location.href = paymentUrl; // Redirect to the payment page
         } else {
           console.error(
             "Payment transaction is null. Full response:",
