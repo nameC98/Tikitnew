@@ -17,45 +17,12 @@ export const loader = async ({ params }) => {
     );
 
     return { selectedEvent: eventResponse.data, tickets: ticketResponse.data };
-    return data;
   } catch (error) {
     return redirect("/");
   }
 };
 
 function GetEventID() {
-  const eventDate = new Date("2024-10-25T09:00:00");
-  const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
-
-  const calculateTimeLeft = () => {
-    const now = new Date();
-    const difference = eventDate - now;
-
-    let time = {};
-    if (difference > 0) {
-      time = {
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
-      };
-    }
-
-    return time;
-  };
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
   const { selectedEvent, tickets } = useLoaderData();
   const eventId = selectedEvent.uid;
   const baseImageUrl = "https://api.tikiti.co.zw/opn/v1/files";
@@ -90,9 +57,9 @@ function GetEventID() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  console.log(tickets);
+  // console.log(tickets);
 
-  console.log(selectedEvent);
+  // console.log(selectedEvent);
 
   return (
     <>
@@ -172,7 +139,7 @@ function GetEventID() {
               </div>
             </div>
 
-            {tickets?.length > 0 ?
+            {tickets?.length > 0 ? (
               <div className="space-y-4 md:overflow-auto">
                 <PopupCartBar
                   isModalOpen={isModalOpen}
@@ -184,8 +151,9 @@ function GetEventID() {
                   eventId={eventId}
                 />
               </div>
-            : <p className=" flex justify-center mt-10">No tickets available</p>
-            }
+            ) : (
+              <p className=" flex justify-center mt-10">No tickets available</p>
+            )}
           </div>
         </div>
 

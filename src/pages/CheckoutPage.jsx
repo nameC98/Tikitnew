@@ -11,9 +11,8 @@ function CheckoutPage() {
     bookedTickets = [],
     totalPrice = 0,
     registrationId,
+    cartUid,
   } = location.state || {};
-
-  console.log(registrationId);
 
   const [eventDetails, setEventDetails] = useState(null);
   const [ticketHolders, setTicketHolders] = useState({});
@@ -23,6 +22,84 @@ function CheckoutPage() {
   const [registrationFields, setRegistrationFields] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userEmail, setUserEmail] = useState("");
+
+  const checkoutCart = async (cartUid, email) => {
+    if (!cartUid || !email) {
+      setError("Missing cart ID or email.");
+      return;
+    }
+
+    try {
+      const productUid = updatedBookedTickets[0]?.uid || "";
+      const quantity = updatedBookedTickets[0]?.quantity || 1;
+      const purchaseDetails = {
+        firstName:
+          ticketHolders[updatedBookedTickets[0]?.name]?.[0]?.name || "",
+        lastName:
+          ticketHolders[updatedBookedTickets[0]?.name]?.[0]?.lastName || "",
+        email: userEmail,
+        phoneNumber: "0782846876",
+      };
+
+      // Step 1: Checkout the Cart
+      const response = await axios.post(
+        `https://api.tikiti.co.zw/opn/v1/cart/${cartUid}/checkout?email=${email}`,
+        {
+          productUid,
+          quantity,
+          purchaseDetails,
+        },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      console.log("Checkout Success:", response.data);
+      alert("Checkout successful!");
+
+      //  Get the Order UID
+      const orderUid = response.data?.orderNumber;
+
+      if (orderUid) {
+        //Initiate Payment
+        const paymentResponse = await axios.post(
+          `https://api.tikiti.co.zw/opn/v1/orders/${orderUid}/initiate-payment`,
+          {
+            paymentMethod: "ONLINE",
+            returnUrl: "https://tikitnew.vercel.app",
+          },
+          { headers: { "Content-Type": "application/json" } }
+        );
+
+        console.log("Payment Response:", paymentResponse.data);
+
+        //Check if paymentTransaction is null
+        if (paymentResponse.data.paymentTransaction) {
+          const paymentUrl =
+            paymentResponse.data.paymentTransaction.redirectUrl;
+          console.log("Redirecting to Payment URL:", paymentUrl);
+          window.location.href = paymentUrl;
+        } else {
+          console.error(
+            "Payment transaction is null. Full response:",
+            paymentResponse.data
+          );
+          setError(
+            "Payment initiation failed. Please check your payment method or try again."
+          );
+        }
+      } else {
+        console.error("Order UID is missing after checkout:", response.data);
+        setError("Failed to process checkout. Please try again.");
+      }
+    } catch (error) {
+      console.error("Checkout Error:", error);
+      setError("Checkout failed. Please try again.");
+      console.error(
+        "Checkout or Payment Error:",
+        error.response?.data || error.message
+      );
+    }
+  };
 
   const fetchEventData = async () => {
     setLoading(true);
@@ -58,9 +135,6 @@ function CheckoutPage() {
     return <p>{error}</p>;
   }
 
-  console.log(registrationFields);
-
-  // Handle input change
   const handleInputChange = (ticketType, index, field, value) => {
     setTicketHolders((prev) => ({
       ...prev,
@@ -74,41 +148,35 @@ function CheckoutPage() {
     }));
   };
 
-  // Handle removing a ticket holder
   const handleRemoveTicketHolder = (ticketType, index) => {
     setTicketHolders((prev) => {
       const updatedTicketHolders = { ...prev };
       if (updatedTicketHolders[ticketType]) {
         delete updatedTicketHolders[ticketType][index];
       }
-
       return updatedTicketHolders;
     });
 
-    // Update the booked tickets state to reduce the quantity for the corresponding ticket type
     setUpdatedBookedTickets((prevTickets) =>
       prevTickets
         .map((ticket) =>
-          ticket.name === ticketType && ticket.quantity > 0 ?
-            { ...ticket, quantity: ticket.quantity - 1 }
-          : ticket
+          ticket.name === ticketType && ticket.quantity > 0
+            ? { ...ticket, quantity: ticket.quantity - 1 }
+            : ticket
         )
         .filter((ticket) => ticket.quantity > 0)
     );
   };
 
-  // Handle adding a ticket holder
   const handleAddTicketHolder = (ticketType) => {
-    // Increment the ticket quantity for the corresponding ticket type
     setUpdatedBookedTickets((prevTickets) =>
       prevTickets.map((ticket) =>
-        ticket.name === ticketType ?
-          { ...ticket, quantity: ticket.quantity + 1 }
-        : ticket
+        ticket.name === ticketType
+          ? { ...ticket, quantity: ticket.quantity + 1 }
+          : ticket
       )
     );
 
-    // Add a new ticket holder for the added ticket
     setTicketHolders((prev) => ({
       ...prev,
       [ticketType]: {
@@ -122,7 +190,6 @@ function CheckoutPage() {
     }));
   };
 
-  // Calculate the total remaining tickets
   const calculateTotalRemaining = () => {
     return updatedBookedTickets.reduce(
       (total, ticket) => total + ticket.quantity,
@@ -130,7 +197,6 @@ function CheckoutPage() {
     );
   };
 
-  // Calculate the total price
   const calculateTotalPrice = () => {
     return updatedBookedTickets.reduce(
       (total, ticket) => total + ticket.quantity * ticket.price,
@@ -150,22 +216,9 @@ function CheckoutPage() {
         </div>
 
         <div className="justify-center items-center flex">
-          <div className="">
-            {/* Left Section - Event Image */}
-            <div className="w-full relative rounded-lg">
-              {eventDetails && eventDetails.image && (
-                <img
-                  src={`${baseImageUrl}/${eventDetails.image}`}
-                  alt={eventDetails.name}
-                  className="w-full h-auto rounded-lg"
-                />
-              )}
-            </div>
-          </div>
-
-          <div className="checkout-container max-w-4xl p-6 bg-white rounded-lg overflow-auto h-[80vh]">
+          <div className=" max-w-4x p-6 bg-white rounded-lg overflow-auto h-[80vh]">
             <div className="flex justify-center items-center">
-              <div className="flex flex-col gap-5">
+              <div className="flex  gap-10">
                 <ul className="space-y-4">
                   {updatedBookedTickets.map((ticket, ticketIndex) => (
                     <li
@@ -189,52 +242,52 @@ function CheckoutPage() {
                           (_, index) => (
                             <div
                               key={index}
-                              className="flex items-center gap-5 mb-5 border py-2 px-5 rounded-md"
+                              className="flex items-center gap-5 mt-4 "
                             >
-                              {(
-                                registrationFields &&
-                                registrationFields.length > 0
-                              ) ?
-                                registrationFields.map((field) => (
-                                  <label key={field.uid} className="block mb-1">
-                                    {field.displayName}:
-                                    <input
-                                      type={
-                                        field.fieldType === "TEXT" ?
-                                          "text"
-                                        : "email"
-                                      }
-                                      placeholder={`Enter ${field.displayName}`}
-                                      value={
-                                        ticketHolders[ticket.name]?.[index]?.[
-                                          field.name
-                                        ] || ""
-                                      }
-                                      onChange={(e) =>
-                                        handleInputChange(
-                                          ticket.name,
-                                          index,
-                                          field.name,
-                                          e.target.value
-                                        )
-                                      }
-                                      className="border border-gray-300 text-[13px] outline-none rounded-md p-1 w-full"
-                                      required={field.mandatory}
-                                    />
-                                  </label>
-                                ))
-                              : <p>No registration fields available.</p>}
-                              {/* Remove Button */}
-                              <div>
-                                <button
-                                  onClick={() =>
-                                    handleRemoveTicketHolder(ticket.name, index)
+                              <div className="flex items-center gap-5 w-full ">
+                                <input
+                                  type="text"
+                                  value={
+                                    ticketHolders[ticket.name]?.[index]?.name ||
+                                    ""
                                   }
-                                  className="bg-red-500  px-5 border text-[13px] outline-none rounded-md p-1 mt-5 w-full font-semibold text-white"
-                                >
-                                  Remove
-                                </button>
+                                  onChange={(e) =>
+                                    handleInputChange(
+                                      ticket.name,
+                                      index,
+                                      "name",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="First Name"
+                                  className="border p-2 rounded-md w-full"
+                                />
+                                <input
+                                  type="email"
+                                  value={
+                                    ticketHolders[ticket.name]?.[index]
+                                      ?.email || ""
+                                  }
+                                  onChange={(e) =>
+                                    handleInputChange(
+                                      ticket.name,
+                                      index,
+                                      "email",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Email"
+                                  className="border p-2 rounded-md w-full"
+                                />
                               </div>
+                              <button
+                                onClick={() =>
+                                  handleRemoveTicketHolder(ticket.name, index)
+                                }
+                                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                              >
+                                Remove
+                              </button>
                             </div>
                           )
                         )}
@@ -242,23 +295,33 @@ function CheckoutPage() {
                     </li>
                   ))}
                 </ul>
-                <div className="flex justify-between items-center mt-6">
-                  <div className="text-lg font-semibold text-green-500">
-                    <span className="text-black">Tickets Remaining:</span>{" "}
-                    {calculateTotalRemaining()}{" "}
+                <div>
+                  {" "}
+                  <div className="">
+                    <h3 className="font-bold text-black/60 flex justify-center text-xl mb-8">
+                      Summary:
+                    </h3>
+                    <div className="flex justify-between mb-4">
+                      <div>Total tickets: {calculateTotalRemaining()}</div>
+                      <div className="font-bold">
+                        Total Price: ${calculateTotalPrice()}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-lg text-green-500 font-semibold">
-                    <span className="text-black">Total Price:</span> $
-                    {calculateTotalPrice()}{" "}
-                  </div>
-                </div>
-                <div className="flex justify-center items-center">
+                  <input
+                    type="email"
+                    value={userEmail}
+                    onChange={(e) => setUserEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="border p-2 rounded-md w-full"
+                  />
+                  {error && <p className="text-red-500">{error}</p>}
                   <button
-                    className="text-lg px-8 py-2 bg-orange-500 text-white rounded-md"
-                    onClick={() => console.log("Proceed to Payment")}
+                    className="text-lg px-8 py-2 bg-orange-500 mt-5 text-white rounded-md"
+                    onClick={() => checkoutCart(cartUid, userEmail)}
                   >
-                    checkout
-                  </button>
+                    Checkout
+                  </button>{" "}
                 </div>
               </div>
             </div>

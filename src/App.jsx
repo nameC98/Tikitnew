@@ -6,6 +6,7 @@ import { loader as geteventloader } from "./pages/GetEventID";
 import GetEventID from "./pages/GetEventID";
 import Purchaseticket from "./pages/Purchaseticket";
 import CheckoutPage from "./pages/CheckoutPage";
+import ConfirmationPage from "./pages/ConfirmationPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -31,6 +32,10 @@ function App() {
         {
           path: "checkoutpage/:eventId",
           element: <CheckoutPage />,
+        },
+        {
+          path: "confirmationpage",
+          element: <ConfirmationPage />,
         },
       ],
     },

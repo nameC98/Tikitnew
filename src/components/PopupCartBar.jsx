@@ -73,7 +73,7 @@ function PopupCartBar({
   };
 
   // Handle booking button click
-  const handleBook = () => {
+  const handleBook = async () => {
     const bookedTickets = tickets
       .map((ticket) => ({
         ...ticket,
@@ -81,22 +81,71 @@ function PopupCartBar({
       }))
       .filter((ticket) => ticket.quantity > 0);
 
-    // Debugging output
-    // console.log("Booked Tickets:", bookedTickets);
-    // console.log("Total Price:", totalPrice);
+    try {
+      // Get the current cart based on the session ID
+      const cartResponse = await axios.get(
+        `https://api.tikiti.co.zw/opn/v1/session/${session.uid}/cart`
+      );
+      const cartUid = cartResponse.data.uid; // Extract cart UID
+      console.log("Cart UID:", cartUid);
 
-    // Check if bookedTickets is not empty before navigating
-    if (bookedTickets.length > 0) {
-      navigate(`/checkoutpage/${eventId}`, {
-        state: {
-          bookedTickets,
-          totalPrice,
-          registrationId: selectedEvent?.eventType.uid,
-        },
-      });
+      const newBookedTickets = [];
+
+      for (const ticket of bookedTickets) {
+        const ticketTotalPrice = ticket.price * ticket.quantity;
+        console.log(
+          `Ticket: ${ticket.name}, Price: ${ticket.price}, Quantity: ${ticket.quantity}, Total Price: ${ticketTotalPrice}`
+        );
+
+        const payload = {
+          parentUid: cartUid,
+          productUid: ticket.uid,
+          // quantity: ticket.quantity,
+          totalAmount: ticketTotalPrice,
+          purchaseDetails: {
+            firstName: "John",
+            lastName: "Doe",
+            email: "johndoe@example.com",
+            phoneNumber: "0782846876",
+          },
+        };
+
+        console.log("Payload being sent to API:", payload);
+
+        // Adding items to the cart
+        const addItemsResponse = await axios.post(
+          `https://api.tikiti.co.zw/opn/v1/cart/${cartUid}/add-items`,
+          payload
+        );
+
+        console.log("Item added to cart response:", addItemsResponse.data);
+
+        const { cartItem } = addItemsResponse.data;
+        newBookedTickets.push(cartItem);
+      }
+
       handleCloseModal();
-    } else {
-      alert("Please select at least one ticket to book.");
+
+      // Process for navigation after booking
+      if (bookedTickets.length > 0) {
+        navigate(`/checkoutpage/${eventId}`, {
+          state: {
+            bookedTickets,
+            totalPrice,
+            registrationId: selectedEvent?.eventType.uid,
+            cartUid,
+          },
+        });
+        handleCloseModal();
+      } else {
+        alert("Please select at least one ticket to book.");
+      }
+    } catch (error) {
+      console.error("Error during booking:", error.response?.data);
+      alert(
+        error.response?.data.message ||
+          "An error occurred while processing your booking."
+      );
     }
   };
 
@@ -129,9 +178,11 @@ function PopupCartBar({
                         Price
                       </p>
                       <p className="text-black/70 text-[14px] lg:text-[15px] md:text-[13px] font-semibold">
-                        {ticket.price > 0 ?
+                        {ticket.price > 0 ? (
                           <p className="ticket-price">${ticket.price}</p>
-                        : <p className="ticket-free">Free</p>}
+                        ) : (
+                          <p className="ticket-free">Free</p>
+                        )}
                       </p>
                     </div>
 
@@ -183,12 +234,9 @@ function PopupCartBar({
           <div></div>
           <motion.button
             className={`text-[12px] md:text-[14px] text-white py-2 px-8 rounded hover:bg-green-700 transition ${
-              (
-                Object.values(quantities).reduce((acc, qty) => acc + qty, 0) ===
-                0
-              ) ?
-                "bg-gray-400 cursor-not-allowed"
-              : "bg-green-600 hover:bg-green-700"
+              Object.values(quantities).reduce((acc, qty) => acc + qty, 0) === 0
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-green-600 hover:bg-green-700"
             }`}
             disabled={
               Object.values(quantities).reduce((acc, qty) => acc + qty, 0) === 0
