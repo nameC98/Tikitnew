@@ -25,6 +25,7 @@ function CheckoutPage() {
   const [userEmail, setUserEmail] = useState("");
 
   const [cartUid, setcartUid] = useState();
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -41,6 +42,19 @@ function CheckoutPage() {
     fetchEvents();
   }, []);
 
+  const handleInputChange = (ticketType, index, field, value) => {
+    setTicketHolders((prev) => ({
+      ...prev,
+      [ticketType]: {
+        ...prev[ticketType],
+        [index]: {
+          ...prev[ticketType]?.[index],
+          [field]: value,
+        },
+      },
+    }));
+  };
+
   const handleCheckout = async () => {
     if (!cartUid) {
       alert("Missing cart ID. Please try again or refresh the page.");
@@ -51,9 +65,13 @@ function CheckoutPage() {
     const missingFields = updatedBookedTickets.some((ticket) =>
       Array.from({ length: ticket.quantity }).some((_, index) => {
         const holder = ticketHolders[ticket.name]?.[index];
-        return !holder?.name || !holder?.email;
+        return registrationFields.some(
+          (field) => field.mandatory && !holder?.[field.name]
+        );
       })
     );
+    console.log("Ticket Holders:", ticketHolders);
+    console.log("Updated Booked Tickets:", updatedBookedTickets);
 
     if (missingFields) {
       alert("Please fill out all required fields for ticket holders.");
@@ -72,27 +90,40 @@ function CheckoutPage() {
       for (const ticket of bookedTickets) {
         const ticketTotalPrice = ticket.price * ticket.quantity;
 
-        // Build purchaseDetails dynamically
-        const purchaseDetails = {
-          firstName:
-            ticketHolders[updatedBookedTickets[0]?.name]?.[0]?.name || "",
-          email: userEmail,
-          lastName:
-            ticketHolders[updatedBookedTickets[0]?.name]?.[0]?.lastName || "", // Always send lastName, even if empty
-        };
+        const purchaseDetails = {};
 
         const phoneNumber =
-          ticketHolders[updatedBookedTickets[0]?.number]?.[0]?.phoneNumber ||
-          "";
+          ticketHolders[updatedBookedTickets[0]?.name]?.[0]?.phoneNumber || "";
+        const firstName =
+          ticketHolders[updatedBookedTickets[0]?.name]?.[0]?.firstName || "";
+        const email = userEmail;
+        const lastName =
+          ticketHolders[updatedBookedTickets[0]?.name]?.[0]?.lastName || "";
+
         if (phoneNumber) {
           purchaseDetails.phoneNumber = phoneNumber;
         }
+
+        if (firstName) {
+          purchaseDetails.firstName = firstName;
+        }
+
+        if (lastName) {
+          purchaseDetails.lastName = lastName;
+        }
+
+        if (email) {
+          purchaseDetails.email = email;
+        }
+
+        console.log(purchaseDetails);
+        console.log(ticketHolders[ticket.name]);
 
         const payload = {
           parentUid: cartUid,
           productUid: ticket.uid,
           totalAmount: ticketTotalPrice,
-          purchaseDetails, // Using the dynamically built object
+          purchaseDetails,
         };
 
         const addItemsResponse = await axios.post(
@@ -121,12 +152,18 @@ function CheckoutPage() {
           {
             paymentMethod: "ONLINE",
             returnUrl: `https://tikitnew.vercel.app/confirmationpage?orderUid=${orderUid}`,
+            
           },
           { headers: { "Content-Type": "application/json" } }
         );
         console.log("Checkout Success:", paymentResponse.data);
-        const paymentUrl = paymentResponse.data.paymentTransaction.redirectUrl;
-        window.location.href = paymentUrl;
+        console.log(
+          "Payment URL:",
+          paymentResponse.data.paymentTransaction.redirectUrl
+        );
+        
+        // const paymentUrl = paymentResponse.data.paymentTransaction.redirectUrl;
+        // window.location.href = paymentUrl;
       } else {
         setError("Failed to process checkout. Please try again.");
       }
@@ -147,6 +184,7 @@ function CheckoutPage() {
           `https://api.tikiti.co.zw/opn/v1/event-types/${registrationId}/registration-fields`
         ),
       ]);
+      console.log(registrationResponse.data);
 
       setEventDetails(eventResponse.data);
       setRegistrationFields(registrationResponse.data);
@@ -169,19 +207,6 @@ function CheckoutPage() {
   if (error) {
     return <p>{error}</p>;
   }
-
-  const handleInputChange = (ticketType, index, field, value) => {
-    setTicketHolders((prev) => ({
-      ...prev,
-      [ticketType]: {
-        ...prev[ticketType],
-        [index]: {
-          ...prev[ticketType]?.[index],
-          [field]: value,
-        },
-      },
-    }));
-  };
 
   const handleRemoveTicketHolder = (ticketType, index) => {
     setTicketHolders((prev) => {
@@ -277,44 +302,42 @@ function CheckoutPage() {
                           (_, index) => (
                             <div
                               key={index}
-                              className="flex items-center gap-5 mt-4 "
+                              className="flex gap-5 mb-5 border py-2 px-5 rounded-md"
                             >
-                              <div className="flex items-center gap-5 w-full ">
-                                <input
-                                  type="text"
-                                  value={
-                                    ticketHolders[ticket.name]?.[index]?.name ||
-                                    ""
-                                  }
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      ticket.name,
-                                      index,
-                                      "name",
-                                      e.target.value
-                                    )
-                                  }
-                                  placeholder="First Name"
-                                  className="border p-2 rounded-md w-full"
-                                />
-                                <input
-                                  type="email"
-                                  value={
-                                    ticketHolders[ticket.name]?.[index]
-                                      ?.email || ""
-                                  }
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      ticket.name,
-                                      index,
-                                      "email",
-                                      e.target.value
-                                    )
-                                  }
-                                  placeholder="Email"
-                                  className="border p-2 rounded-md w-full"
-                                />
-                              </div>
+                              {registrationFields &&
+                              registrationFields.length > 0 ? (
+                                registrationFields.map((field) => (
+                                  <label key={field.uid} className="block mb-1">
+                                    {field.displayName}:
+                                    <input
+                                      type={
+                                        field.fieldType === "TEXT"
+                                          ? "text"
+                                          : "email"
+                                      }
+                                      placeholder={`Enter ${field.displayName}`}
+                                      value={
+                                        ticketHolders[ticket.name]?.[index]?.[
+                                          field.name
+                                        ] || ""
+                                      }
+                                      onChange={(e) =>
+                                        handleInputChange(
+                                          ticket.name,
+                                          index,
+                                          field.name,
+                                          e.target.value
+                                        )
+                                      }
+                                      className="border border-gray-300 text-[13px] outline-none rounded-md p-1 w-full"
+                                      required={field.mandatory}
+                                    />
+                                  </label>
+                                ))
+                              ) : (
+                                <p>No registration fields available.</p>
+                              )}
+                              {/* Remove Button */}
                               <button
                                 onClick={() =>
                                   handleRemoveTicketHolder(ticket.name, index)

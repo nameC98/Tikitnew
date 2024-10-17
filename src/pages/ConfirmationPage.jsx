@@ -3,39 +3,36 @@ import axios from "axios";
 
 const ConfirmationPage = () => {
   const [orderDetails, setOrderDetails] = useState(null);
-  const [error, setError] = useState(null); // To handle and display errors
+  // const orderUid = new URLSearchParams(window.location.search).get("orderUid");
+
   const orderUidInfo = new URLSearchParams(window.location.search);
   const orderUid = Object.fromEntries(orderUidInfo.entries());
-  console.log(orderUid);
 
   console.log(orderUid);
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
-        if (!orderUid) {
-          throw new Error("No order ID found in the URL.");
-        }
-
         const response = await axios.get(
           `https://api.tikiti.co.zw/opn/v1/orders/${orderUid}`
         );
         setOrderDetails(response.data);
       } catch (error) {
         console.error("Error fetching order details:", error);
-        setError(error.message || "Failed to fetch order details.");
+        // Handle error appropriately (e.g., display an error message)
       }
     };
 
-    fetchOrderDetails();
+    if (orderUid) {
+      fetchOrderDetails();
+    } else {
+      // Handle the case where orderUid is missing
+      console.error("No order ID found in the URL.");
+    }
   }, [orderUid]);
 
-  if (error) {
-    return <div>Error: {error}</div>; // Display any error that occurs
-  }
-
   if (!orderDetails) {
-    return <div>Loading...</div>; // Loading state
+    return <div>Loading...</div>; // Or a loading spinner
   }
 
   return (
