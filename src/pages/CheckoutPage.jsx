@@ -81,8 +81,9 @@ function CheckoutPage() {
             ticketHolders[updatedBookedTickets[0]?.name]?.[0]?.lastName || "", // Always send lastName, even if empty
         };
 
-        // Only add phoneNumber if it's not empty or undefined
-        const phoneNumber = "0782846876"; // You can make this dynamic if needed
+        const phoneNumber =
+          ticketHolders[updatedBookedTickets[0]?.number]?.[0]?.phoneNumber ||
+          "";
         if (phoneNumber) {
           purchaseDetails.phoneNumber = phoneNumber;
         }
@@ -119,7 +120,7 @@ function CheckoutPage() {
           `https://api.tikiti.co.zw/opn/v1/orders/${orderUid}/initiate-payment`,
           {
             paymentMethod: "ONLINE",
-            returnUrl: "https://tikitnew.vercel.app/confirmationpage",
+            returnUrl: `https://tikitnew.vercel.app/confirmationpage?orderUid=${orderUid}`,
           },
           { headers: { "Content-Type": "application/json" } }
         );
