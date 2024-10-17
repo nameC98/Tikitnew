@@ -11,7 +11,7 @@ function CheckoutPage() {
     bookedTickets = [],
     totalPrice = 0,
     registrationId,
-    cartUid,
+    session,
   } = location.state || {};
 
   const [eventDetails, setEventDetails] = useState(null);
@@ -24,79 +24,106 @@ function CheckoutPage() {
   const [error, setError] = useState(null);
   const [userEmail, setUserEmail] = useState("");
 
-  const checkoutCart = async (cartUid, email) => {
-    if (!cartUid || !email) {
-      setError("Missing cart ID or email.");
+  const [cartUid, setcartUid] = useState();
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get(
+          `https://api.tikiti.co.zw/opn/v1/session/${session.uid}/cart`
+        );
+
+        setcartUid(response.data.uid);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  const handleCheckout = async () => {
+    if (!cartUid) {
+      alert("Missing cart ID. Please try again or refresh the page.");
+      return;
+    }
+
+    // Check if all required fields are filled
+    const missingFields = updatedBookedTickets.some((ticket) =>
+      Array.from({ length: ticket.quantity }).some((_, index) => {
+        const holder = ticketHolders[ticket.name]?.[index];
+        return !holder?.name || !holder?.email;
+      })
+    );
+
+    if (missingFields) {
+      alert("Please fill out all required fields for ticket holders.");
+      return;
+    }
+
+    // Check if user email is filled
+    if (!userEmail) {
+      alert("Please enter your email.");
       return;
     }
 
     try {
-      const productUid = updatedBookedTickets[0]?.uid || "";
-      const quantity = updatedBookedTickets[0]?.quantity || 1;
-      const purchaseDetails = {
-        firstName:
-          ticketHolders[updatedBookedTickets[0]?.name]?.[0]?.name || "",
-        lastName:
-          ticketHolders[updatedBookedTickets[0]?.name]?.[0]?.lastName || "",
-        email: userEmail,
-        phoneNumber: "0782846876",
-      };
+      const newBookedTickets = [];
 
-      // Step 1: Checkout the Cart
+      for (const ticket of bookedTickets) {
+        const ticketTotalPrice = ticket.price * ticket.quantity;
+
+        const payload = {
+          parentUid: cartUid,
+          productUid: ticket.uid,
+          totalAmount: ticketTotalPrice,
+          purchaseDetails: {
+            firstName:
+              ticketHolders[updatedBookedTickets[0]?.name]?.[0]?.name || "",
+            lastName:
+              ticketHolders[updatedBookedTickets[0]?.name]?.[0]?.lastName || "",
+            email: userEmail,
+            phoneNumber: "0782846876",
+          },
+        };
+
+        const addItemsResponse = await axios.post(
+          `https://api.tikiti.co.zw/opn/v1/cart/${cartUid}/add-items`,
+          payload
+        );
+
+        const { cartItem } = addItemsResponse.data;
+        newBookedTickets.push(cartItem);
+      }
+
+      // Proceed with the checkout
       const response = await axios.post(
-        `https://api.tikiti.co.zw/opn/v1/cart/${cartUid}/checkout?email=${email}`,
+        `https://api.tikiti.co.zw/opn/v1/cart/${cartUid}/checkout?email=${userEmail}`,
         {
-          productUid,
-          quantity,
-          purchaseDetails,
+          productUid: updatedBookedTickets[0]?.uid || "",
         },
         { headers: { "Content-Type": "application/json" } }
       );
 
-      console.log("Checkout Success:", response.data);
-      alert("Checkout successful!");
-
-      // Get the Order UID
       const orderUid = response.data?.orderNumber;
 
       if (orderUid) {
-        // Initiate Payment with the specific return URL
         const paymentResponse = await axios.post(
           `https://api.tikiti.co.zw/opn/v1/orders/${orderUid}/initiate-payment`,
           {
             paymentMethod: "ONLINE",
-            returnUrl: "https://tikitnew.vercel.app/confirmationpage", // Set the return URL to your confirmation page
+            returnUrl: "https://tikitnew.vercel.app/confirmationpage",
           },
           { headers: { "Content-Type": "application/json" } }
         );
 
-        console.log("Payment Response:", paymentResponse.data);
-
-        if (paymentResponse.data.paymentTransaction) {
-          const paymentUrl =
-            paymentResponse.data.paymentTransaction.redirectUrl;
-          console.log("Redirecting to Payment URL:", paymentUrl);
-          window.location.href = paymentUrl; // Redirect to the payment page
-        } else {
-          console.error(
-            "Payment transaction is null. Full response:",
-            paymentResponse.data
-          );
-          setError(
-            "Payment initiation failed. Please check your payment method or try again."
-          );
-        }
+        const paymentUrl = paymentResponse.data.paymentTransaction.redirectUrl;
+        window.location.href = paymentUrl;
       } else {
-        console.error("Order UID is missing after checkout:", response.data);
         setError("Failed to process checkout. Please try again.");
       }
     } catch (error) {
-      console.error("Checkout Error:", error);
+      console.error("Error during checkout:", error);
       setError("Checkout failed. Please try again.");
-      console.error(
-        "Checkout or Payment Error:",
-        error.response?.data || error.message
-      );
     }
   };
 
@@ -293,6 +320,9 @@ function CheckoutPage() {
                       </div>
                     </li>
                   ))}
+                  <button className="text-lg px-8 py-2 bg-orange-500 mt-5 text-white rounded-md">
+                    Save
+                  </button>{" "}
                 </ul>
                 <div>
                   {" "}
@@ -317,7 +347,7 @@ function CheckoutPage() {
                   {error && <p className="text-red-500">{error}</p>}
                   <button
                     className="text-lg px-8 py-2 bg-orange-500 mt-5 text-white rounded-md"
-                    onClick={() => checkoutCart(cartUid, userEmail)}
+                    onClick={handleCheckout}
                   >
                     Checkout
                   </button>{" "}

@@ -82,47 +82,47 @@ function PopupCartBar({
       .filter((ticket) => ticket.quantity > 0);
 
     try {
-      // Get the current cart based on the session ID
-      const cartResponse = await axios.get(
-        `https://api.tikiti.co.zw/opn/v1/session/${session.uid}/cart`
-      );
-      const cartUid = cartResponse.data.uid; // Extract cart UID
-      console.log("Cart UID:", cartUid);
+      // // Get the current cart based on the session ID
+      // const cartResponse = await axios.get(
+      //   `https://api.tikiti.co.zw/opn/v1/session/${session.uid}/cart`
+      // );
+      // const cartUid = cartResponse.data.uid; // Extract cart UID
+      // console.log("Cart UID:", cartUid);
 
-      const newBookedTickets = [];
+      // const newBookedTickets = [];
 
-      for (const ticket of bookedTickets) {
-        const ticketTotalPrice = ticket.price * ticket.quantity;
-        console.log(
-          `Ticket: ${ticket.name}, Price: ${ticket.price}, Quantity: ${ticket.quantity}, Total Price: ${ticketTotalPrice}`
-        );
+      // for (const ticket of bookedTickets) {
+      //   const ticketTotalPrice = ticket.price * ticket.quantity;
+      //   console.log(
+      //     `Ticket: ${ticket.name}, Price: ${ticket.price}, Quantity: ${ticket.quantity}, Total Price: ${ticketTotalPrice}`
+      //   );
 
-        const payload = {
-          parentUid: cartUid,
-          productUid: ticket.uid,
-          // quantity: ticket.quantity,
-          totalAmount: ticketTotalPrice,
-          purchaseDetails: {
-            firstName: "John",
-            lastName: "Doe",
-            email: "johndoe@example.com",
-            phoneNumber: "0782846876",
-          },
-        };
+      //   const payload = {
+      //     parentUid: cartUid,
+      //     productUid: ticket.uid,
+      //     // quantity: ticket.quantity,
+      //     totalAmount: ticketTotalPrice,
+      //     purchaseDetails: {
+      //       firstName: "John",
+      //       lastName: "Doe",
+      //       email: "johndoe@example.com",
+      //       phoneNumber: "0782846876",
+      //     },
+      //   };
 
-        console.log("Payload being sent to API:", payload);
+      //   console.log("Payload being sent to API:", payload);
 
-        // Adding items to the cart
-        const addItemsResponse = await axios.post(
-          `https://api.tikiti.co.zw/opn/v1/cart/${cartUid}/add-items`,
-          payload
-        );
+      //   // Adding items to the cart
+      //   const addItemsResponse = await axios.post(
+      //     `https://api.tikiti.co.zw/opn/v1/cart/${cartUid}/add-items`,
+      //     payload
+      //   );
 
-        console.log("Item added to cart response:", addItemsResponse.data);
+      //   console.log("Item added to cart response:", addItemsResponse.data);
 
-        const { cartItem } = addItemsResponse.data;
-        newBookedTickets.push(cartItem);
-      }
+      //   const { cartItem } = addItemsResponse.data;
+      //   newBookedTickets.push(cartItem);
+      // }
 
       handleCloseModal();
 
@@ -133,7 +133,7 @@ function PopupCartBar({
             bookedTickets,
             totalPrice,
             registrationId: selectedEvent?.eventType.uid,
-            cartUid,
+            session,
           },
         });
         handleCloseModal();
