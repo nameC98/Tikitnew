@@ -72,25 +72,33 @@ function CheckoutPage() {
       for (const ticket of bookedTickets) {
         const ticketTotalPrice = ticket.price * ticket.quantity;
 
+        // Build purchaseDetails dynamically
+        const purchaseDetails = {
+          firstName:
+            ticketHolders[updatedBookedTickets[0]?.name]?.[0]?.name || "",
+          email: userEmail,
+          lastName:
+            ticketHolders[updatedBookedTickets[0]?.name]?.[0]?.lastName || "", // Always send lastName, even if empty
+        };
+
+        // Only add phoneNumber if it's not empty or undefined
+        const phoneNumber = "0782846876"; // You can make this dynamic if needed
+        if (phoneNumber) {
+          purchaseDetails.phoneNumber = phoneNumber;
+        }
+
         const payload = {
           parentUid: cartUid,
           productUid: ticket.uid,
           totalAmount: ticketTotalPrice,
-          purchaseDetails: {
-            firstName:
-              ticketHolders[updatedBookedTickets[0]?.name]?.[0]?.name || "",
-            lastName:
-              ticketHolders[updatedBookedTickets[0]?.name]?.[0]?.lastName || "",
-            email: userEmail,
-            phoneNumber: "0782846876",
-          },
+          purchaseDetails, // Using the dynamically built object
         };
 
         const addItemsResponse = await axios.post(
           `https://api.tikiti.co.zw/opn/v1/cart/${cartUid}/add-items`,
           payload
         );
-
+        console.log("cart:", addItemsResponse.data);
         const { cartItem } = addItemsResponse.data;
         newBookedTickets.push(cartItem);
       }
@@ -115,7 +123,7 @@ function CheckoutPage() {
           },
           { headers: { "Content-Type": "application/json" } }
         );
-
+        console.log("Checkout Success:", paymentResponse.data);
         const paymentUrl = paymentResponse.data.paymentTransaction.redirectUrl;
         window.location.href = paymentUrl;
       } else {
