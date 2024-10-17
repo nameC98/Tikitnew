@@ -152,7 +152,6 @@ function CheckoutPage() {
           {
             paymentMethod: "ONLINE",
             returnUrl: `https://tikitnew.vercel.app/confirmationpage?orderUid=${orderUid}`,
-            
           },
           { headers: { "Content-Type": "application/json" } }
         );
@@ -161,9 +160,9 @@ function CheckoutPage() {
           "Payment URL:",
           paymentResponse.data.paymentTransaction.redirectUrl
         );
-        
-        // const paymentUrl = paymentResponse.data.paymentTransaction.redirectUrl;
-        // window.location.href = paymentUrl;
+
+        const paymentUrl = paymentResponse.data.paymentTransaction.redirectUrl;
+        window.location.href = paymentUrl;
       } else {
         setError("Failed to process checkout. Please try again.");
       }
