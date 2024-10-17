@@ -15,25 +15,7 @@ function PopupCartBar({
   const [ticketPrices, setTicketPrices] = useState({});
   const [quantities, setQuantities] = useState({});
   const navigate = useNavigate();
-  // console.log(eventId);
-
-  const [session, setSession] = useState();
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const response = await axios.get(
-          "https://api.tikiti.co.zw/opn/v1/sessions/current-session"
-        );
-        setSession(response.data);
-      } catch (error) {
-        console.error("Error fetching events:", error);
-      }
-    };
-
-    fetchEvents();
-  }, []);
-
-  console.log(session);
+  console.log(eventId);
 
   // Initialize ticketPrices from tickets array
   useEffect(() => {
@@ -73,7 +55,7 @@ function PopupCartBar({
   };
 
   // Handle booking button click
-  const handleBook = async () => {
+  const handleBook = () => {
     const bookedTickets = tickets
       .map((ticket) => ({
         ...ticket,
@@ -81,71 +63,18 @@ function PopupCartBar({
       }))
       .filter((ticket) => ticket.quantity > 0);
 
-    try {
-      // // Get the current cart based on the session ID
-      // const cartResponse = await axios.get(
-      //   `https://api.tikiti.co.zw/opn/v1/session/${session.uid}/cart`
-      // );
-      // const cartUid = cartResponse.data.uid; // Extract cart UID
-      // console.log("Cart UID:", cartUid);
+    // Debugging output
+    console.log("Booked Tickets:", bookedTickets);
+    console.log("Total Price:", totalPrice);
 
-      // const newBookedTickets = [];
-
-      // for (const ticket of bookedTickets) {
-      //   const ticketTotalPrice = ticket.price * ticket.quantity;
-      //   console.log(
-      //     `Ticket: ${ticket.name}, Price: ${ticket.price}, Quantity: ${ticket.quantity}, Total Price: ${ticketTotalPrice}`
-      //   );
-
-      //   const payload = {
-      //     parentUid: cartUid,
-      //     productUid: ticket.uid,
-      //     // quantity: ticket.quantity,
-      //     totalAmount: ticketTotalPrice,
-      //     purchaseDetails: {
-      //       firstName: "John",
-      //       lastName: "Doe",
-      //       email: "johndoe@example.com",
-      //       phoneNumber: "0782846876",
-      //     },
-      //   };
-
-      //   console.log("Payload being sent to API:", payload);
-
-      //   // Adding items to the cart
-      //   const addItemsResponse = await axios.post(
-      //     `https://api.tikiti.co.zw/opn/v1/cart/${cartUid}/add-items`,
-      //     payload
-      //   );
-
-      //   console.log("Item added to cart response:", addItemsResponse.data);
-
-      //   const { cartItem } = addItemsResponse.data;
-      //   newBookedTickets.push(cartItem);
-      // }
-
+    // Check if bookedTickets is not empty before navigating
+    if (bookedTickets.length > 0) {
+      navigate(`/checkoutpage/${eventId}`, {
+        state: { bookedTickets, totalPrice },
+      });
       handleCloseModal();
-
-      // Process for navigation after booking
-      if (bookedTickets.length > 0) {
-        navigate(`/checkoutpage/${eventId}`, {
-          state: {
-            bookedTickets,
-            totalPrice,
-            registrationId: selectedEvent?.eventType.uid,
-            session,
-          },
-        });
-        handleCloseModal();
-      } else {
-        alert("Please select at least one ticket to book.");
-      }
-    } catch (error) {
-      console.error("Error during booking:", error.response?.data);
-      alert(
-        error.response?.data.message ||
-          "An error occurred while processing your booking."
-      );
+    } else {
+      alert("Please select at least one ticket to book.");
     }
   };
 

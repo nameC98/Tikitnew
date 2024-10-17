@@ -7,6 +7,8 @@ import GetEventID from "./pages/GetEventID";
 import Purchaseticket from "./pages/Purchaseticket";
 import CheckoutPage from "./pages/CheckoutPage";
 import ConfirmationPage from "./pages/ConfirmationPage";
+import ThankYou from "./pages/ThankYou";
+import PurchaseFailed from "./pages/PurchaseFailed";
 
 function App() {
   const router = createBrowserRouter([
@@ -36,6 +38,15 @@ function App() {
         {
           path: "confirmationpage",
           element: <ConfirmationPage />,
+        },
+
+        {
+          path: "thankyou",
+          element: <ThankYou />,
+        },
+        {
+          path: "purchasefailed",
+          element: <PurchaseFailed />,
         },
       ],
     },

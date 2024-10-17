@@ -1,8 +1,12 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import banner from "../assets/img/banner.svg";
+import heroImg from "../assets/img/heroImage.jpg";
+import { motion } from "framer-motion";
+import { IoTrashOutline } from "react-icons/io5";
 
 function CheckoutPage() {
   const location = useLocation();
@@ -151,7 +155,7 @@ function CheckoutPage() {
           `https://api.tikiti.co.zw/opn/v1/orders/${orderUid}/initiate-payment`,
           {
             paymentMethod: "ONLINE",
-            returnUrl: `https://tikitnew.vercel.app/confirmationpage?orderUid=${orderUid}`,
+            returnUrl: `https://tikitnew.vercel.app/thankyou?orderUid=${orderUid}`,
           },
           { headers: { "Content-Type": "application/json" } }
         );
@@ -199,13 +203,13 @@ function CheckoutPage() {
     fetchEventData();
   }, [eventId, registrationId]);
 
-  if (loading) {
-    return <p>Loading event data...</p>;
-  }
+  // if (loading) {
+  //   return <p>Loading event data...</p>;
+  // }
 
-  if (error) {
-    return <p>{error}</p>;
-  }
+  // if (error) {
+  //   return <p>{error}</p>;
+  // }
 
   const handleRemoveTicketHolder = (ticketType, index) => {
     setTicketHolders((prev) => {
@@ -266,128 +270,131 @@ function CheckoutPage() {
   return (
     <>
       <Navbar />
-      <div className="justify-center items-center flex-col">
-        <div className="flex flex-col justify-center items-center mt-5 gap-1">
-          <h1 className="text-[20px] lg:text-[23px] font-bold text-black/70">
-            {eventDetails?.name}
-          </h1>
-          <h2 className="text-lg font-semibold text-black/70">Your Tickets:</h2>
-        </div>
 
-        <div className="justify-center items-center flex">
-          <div className=" max-w-4x p-6 bg-white rounded-lg overflow-auto h-[80vh]">
-            <div className="flex justify-center items-center">
-              <div className="flex  gap-10">
-                <ul className="space-y-4">
-                  {updatedBookedTickets.map((ticket, ticketIndex) => (
-                    <li
-                      key={ticketIndex}
-                      className="border border-gray-300 rounded-md p-4"
-                    >
-                      <div className="flex justify-between gap-[2rem] items-center">
-                        <div className="font-semibold">{ticket.name}</div>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleAddTicketHolder(ticket.name)}
-                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
-                          >
-                            Add
-                          </button>
-                        </div>
-                      </div>
+      {/* Hero Section */}
+      <header className="banner" style={{ backgroundImage: `url(${heroImg})` }}>
+        <div className="banner__overlay"></div>
+        <motion.div
+          className="flex flex-col justify-center items-center "
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0, transition: { duration: 1 } }}
+        >
+          {/* <p className="banner__caption">Welcome Webster</p> */}
+          <h1 className="banner__heading">{eventDetails?.name}</h1>
+          {/* <motion.button className="banner__button">
+            Get Started
+          </motion.button> */}
+        </motion.div>
+      </header>
 
-                      <div className="mt-4">
-                        {Array.from({ length: ticket.quantity }).map(
-                          (_, index) => (
-                            <div
-                              key={index}
-                              className="flex gap-5 mb-5 border py-2 px-5 rounded-md"
+      <div class="content-area">
+        <div class="billing-info">
+          {updatedBookedTickets.map((ticket, ticketIndex) => (
+            <>
+              <section class="ticket-holder">
+                <h2 class="ticket-holder__event-name">{ticket.name}</h2>
+
+                {Array.from({ length: ticket.quantity }).map((_, index) => (
+                  <div class="flex flex-col lg:flex-row lg:space-x-4 lg:items-center">
+                    {registrationFields && registrationFields.length > 0 ? (
+                      registrationFields.map((field) => (
+                        <>
+                          <div class="w-full lg:w-2/5">
+                            <label
+                              for="name"
+                              class="block text-sm font-medium text-gray-600"
                             >
-                              {registrationFields &&
-                              registrationFields.length > 0 ? (
-                                registrationFields.map((field) => (
-                                  <label key={field.uid} className="block mb-1">
-                                    {field.displayName}:
-                                    <input
-                                      type={
-                                        field.fieldType === "TEXT"
-                                          ? "text"
-                                          : "email"
-                                      }
-                                      placeholder={`Enter ${field.displayName}`}
-                                      value={
-                                        ticketHolders[ticket.name]?.[index]?.[
-                                          field.name
-                                        ] || ""
-                                      }
-                                      onChange={(e) =>
-                                        handleInputChange(
-                                          ticket.name,
-                                          index,
-                                          field.name,
-                                          e.target.value
-                                        )
-                                      }
-                                      className="border border-gray-300 text-[13px] outline-none rounded-md p-1 w-full"
-                                      required={field.mandatory}
-                                    />
-                                  </label>
-                                ))
-                              ) : (
-                                <p>No registration fields available.</p>
-                              )}
-                              {/* Remove Button */}
-                              <button
-                                onClick={() =>
-                                  handleRemoveTicketHolder(ticket.name, index)
+                              {field.displayName}:
+                              <input
+                                type={
+                                  field.fieldType === "TEXT" ? "text" : "email"
                                 }
-                                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
-                              >
-                                Remove
-                              </button>
-                            </div>
-                          )
-                        )}
-                      </div>
-                    </li>
-                  ))}
-                  <button className="text-lg px-8 py-2 bg-orange-500 mt-5 text-white rounded-md">
-                    Save
-                  </button>{" "}
-                </ul>
-                <div>
-                  {" "}
-                  <div className="">
-                    <h3 className="font-bold text-black/60 flex justify-center text-xl mb-8">
-                      Summary:
-                    </h3>
-                    <div className="flex justify-between mb-4">
-                      <div>Total tickets: {calculateTotalRemaining()}</div>
-                      <div className="font-bold">
-                        Total Price: ${calculateTotalPrice()}
-                      </div>
+                                placeholder={`Enter ${field.displayName}`}
+                                value={
+                                  ticketHolders[ticket.name]?.[index]?.[
+                                    field.name
+                                  ] || ""
+                                }
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    ticket.name,
+                                    index,
+                                    field.name,
+                                    e.target.value
+                                  )
+                                }
+                                class="mt-1 p-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                required={field.mandatory}
+                              />
+                            </label>
+                          </div>
+                        </>
+                      ))
+                    ) : (
+                      <p>No registration fields available.</p>
+                    )}
+                    <div class="mt-6 lg:pl-5 w-full lg:w-1/5 flex justify-start">
+                      <button className="ticket-holder__remove">
+                        <IoTrashOutline
+                          onClick={() =>
+                            handleRemoveTicketHolder(ticket.name, index)
+                          }
+                        />
+                      </button>
                     </div>
                   </div>
-                  <input
-                    type="email"
-                    value={userEmail}
-                    onChange={(e) => setUserEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    className="border p-2 rounded-md w-full"
-                  />
-                  {error && <p className="text-red-500">{error}</p>}
-                  <button
-                    className="text-lg px-8 py-2 bg-orange-500 mt-5 text-white rounded-md"
-                    onClick={handleCheckout}
-                  >
-                    Checkout
-                  </button>{" "}
+                ))}
+              </section>
+            </>
+          ))}
+
+          {/* <!-- Order Summary --> */}
+          <div class="order-summary">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">
+              Order Summary
+            </h2>
+            {updatedBookedTickets.map((ticket, ticketIndex) => (
+              <>
+                <div class="border-b pb-4 mb-4">
+                  <div class="flex justify-between">
+                    <span>{ticket.name}</span>
+                    <span>{ticket.price}</span>
+                  </div>
                 </div>
-              </div>
-            </div>
+
+                <div class="flex justify-between font-semibold text-gray-700">
+                  <span>Total</span>
+                  <span>${calculateTotalPrice()}</span>
+                </div>
+              </>
+            ))}
+            <input
+              type="email"
+              value={userEmail}
+              onChange={(e) => setUserEmail(e.target.value)}
+              placeholder="Enter your email"
+              className="border p-2 mt-10 rounded-md w-full outline-green-600"
+            />
+            <button
+              onClick={handleCheckout}
+              class="w-full mt-4 bg-green-600 text-white  font-semibold py-2 rounded-md hover:bg-green-700 transition duration-300"
+            >
+              Place Order
+            </button>
           </div>
         </div>
       </div>
+
+      {/* <button
+        className={
+          updatedBookedTickets.length
+            ? "py-2 px-10 mt-6 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+            : "py-2 px-10 mt-6 bg-gray-500 text-white rounded cursor-not-allowed transition"
+        }
+      >
+        Buy
+      </button> */}
+
       <Footer />
     </>
   );

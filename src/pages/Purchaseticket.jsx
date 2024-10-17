@@ -91,9 +91,9 @@ const Purchaseticket = () => {
                 value={formData.firstName}
                 onChange={handleChange}
                 className={`w-full p-2 border rounded-lg sm:text-[15px] text-[12px] focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                  !formData.firstName && error ?
-                    "border-red-500 "
-                  : "border-gray-300"
+                  !formData.firstName && error
+                    ? "border-red-500 "
+                    : "border-gray-300"
                 }`}
                 required
               />
@@ -104,9 +104,9 @@ const Purchaseticket = () => {
                 value={formData.lastName}
                 onChange={handleChange}
                 className={`w-full p-2 border rounded-lg sm:text-[15px] text-[12px] focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                  !formData.lastName && error ?
-                    "border-red-500"
-                  : "border-gray-300"
+                  !formData.lastName && error
+                    ? "border-red-500"
+                    : "border-gray-300"
                 }`}
                 required
               />
@@ -117,9 +117,9 @@ const Purchaseticket = () => {
                 value={formData.email}
                 onChange={handleChange}
                 className={`w-full p-2 border rounded-lg sm:text-[15px] text-[12px] focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                  !formData.email && error ?
-                    "border-red-500"
-                  : "border-gray-300"
+                  !formData.email && error
+                    ? "border-red-500"
+                    : "border-gray-300"
                 }`}
                 required
               />

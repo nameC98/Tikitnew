@@ -1,5 +1,5 @@
-import banner from "../../assets/imgs/banner.jpg";
-import heroImg from "../../assets/imgs/heroImage.jpg";
+import banner from "../assets/img/banner.svg";
+import heroImg from "../assets/img/heroImage.jpg";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -99,39 +99,22 @@ function Home() {
       </div>
 
       {/* Hero Section */}
-
       <header
-        className="relative bg-cover bg-center sm:h-[100vh] h-[60vh] flex flex-col justify-center items-center text-white"
+        className="hero-section"
         style={{ backgroundImage: `url(${heroImg})` }}
       >
-        <div className="bg-black/50 w-full absolute sm:h-[100vh] h-[60vh]"></div>
+        <div className="hero-section__overlay"></div>
         <motion.div
           className="flex flex-col justify-center items-center "
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0, transition: { duration: 1 } }}
         >
-          <h1 className="font-bold text-[43px] sm:text-5xl leading-tight tracking-wide">
-            Come ALive!
-          </h1>
-          <p className="mt-4 sm:block hidden  text-[15px] sm:text-xl  text-white/80">
+          <h1 className="hero-section__heading">Come ALive!</h1>
+          <p className="hero-section__caption">
             Get front row experience for your favourite show.
           </p>
 
-          <div className="sm:hidden block mt-4">
-            <p className=" text-[17.8px] sm:text-xl font-medium leading-tight tracking-wide  text-white/80">
-              Get front row experience for
-            </p>
-            <p className=" flex items-center  font-medium leading-tight tracking-wide justify-center w-full text-[17.8px] sm:text-xl  text-white/80">
-              your favourite show.
-            </p>
-          </div>
-
-          <motion.button
-            className="z-50 mt-6 bg-white text-green-500 px-6 py-[8px] rounded-3xl font-bold"
-            whileTap={{ scale: 0.85 }}
-            whileHover={{ scale: 1.1 }}
-            transition={{ duration: 0.3 }}
-          >
+          <motion.button className="hero-section__button">
             Get Started
           </motion.button>
         </motion.div>
@@ -139,15 +122,13 @@ function Home() {
 
       {/* Trending Events Section */}
       <section
-        className="bg-white py-[4rem] text-center"
+        className="trending-section"
         style={{ backgroundImage: `url(${banner})` }}
       >
-        <h2 className="font-bold text-3xl sm:text-4xl  text-white tracking-wide leading-tight">
-          Trending Events
-        </h2>
+        <h2 className="trending-section__heading">Trending Events</h2>
       </section>
 
-      <section className="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="content-area">
         <motion.div
           initial={{
             opacity: 0,
@@ -160,12 +141,12 @@ function Home() {
               duration: 1,
             },
           }}
-          className="grid  xl:px-[2rem] grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          className="cards-section"
         >
           {getallevents?.content?.map((event) => (
             <div key={event.id}>
               <motion.div
-                className="border rounded-lg overflow-hidden shadow-sm bg-white"
+                className="cards-section-card"
                 whileHover={{
                   scale: 1.05,
                   boxShadow: "0px 10px 15px rgba(0, 0, 0, 0.2)",
@@ -179,46 +160,42 @@ function Home() {
                 >
                   <img
                     src={`${baseImageUrl}?fileName=${event.imageFileName}`}
-                    alt="Event"
-                    className="w-[20rem] h-[15rem] object-cover"
+                    alt="Place Event name from Database"
+                    className="cards-section-card__image"
                   />
                   <div className="p-3">
                     <div className="flex justify-between">
                       <div>
-                        <h3 className="text-sm text-green-600">{event.date}</h3>
-                        <h2 className="font-bold text-lg text-black/80 sm:text-[14px] text-[12.8px]">
+                        <h3 className="cards-section-card__date">
+                          {event.date}
+                        </h3>
+                        <h2 className="cards-section-card__title">
                           {event.name}
                         </h2>
                       </div>
                       <div>
-                        <h3 className="sm:text-[12px] text-[12.8px] flex flex-shrink-0 text-green-600">
+                        <h3 className="cards-section-card__eventType">
                           {event.eventType.name}
                         </h3>
                       </div>
                     </div>
 
-                    {loading[event.uid] ?
+                    {loading[event.uid] ? (
                       <Loader />
-                    : <motion.button
-                        className="mt-4 bg-green-500 text-white px-4 sm:text-[14px] text-[13px] py-2 rounded-3xl w-full"
-                        whileHover={{ scale: 1.1, backgroundColor: "#38b2ac" }}
-                        transition={{ duration: 0.3 }}
-                        whileTap={{ scale: 0.85 }}
-                      >
+                    ) : (
+                      <motion.button className="cards-section-card__button">
                         Book Now
                       </motion.button>
-                    }
+                    )}
                   </div>
                 </Link>
               </motion.div>
             </div>
           ))}
         </motion.div>
+
         <div className="text-center mt-8">
-          <a
-            href="#browse"
-            className="text-green-600 font-semibold sm:text-[16px] text-[15px] hover:underline"
-          >
+          <a href="#browse" className="browse-all-events">
             Browse All Events →
           </a>
         </div>
