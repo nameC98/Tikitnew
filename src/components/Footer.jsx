@@ -19,7 +19,7 @@ function Footer() {
             <ul>
               <li>
                 <a
-                  href="#"
+                  href="/"
                   className="hover:text-white sm:text-[15px] text-[12px]"
                 >
                   Home
