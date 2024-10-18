@@ -62,10 +62,10 @@ const Result = () => {
               <span>Reference</span>
               <span>{order?.paymentTransaction.pgReferenceNumber}</span>
             </div>
-            {/* <div className="py-3 flex justify-between sm:text-[18px] text-[16px] sm:px-[4rem] px-[1rem] text-gray-600">
-              <span>Reason for Payment</span>
-              <span>Donation</span>
-            </div> */}
+            <div className="py-3 flex justify-between sm:text-[18px] text-[16px] sm:px-[4rem] px-[1rem] text-gray-600">
+              <span>Email Address</span>
+              <span>{order?.email}</span>
+            </div>
             <div className="py-3 flex justify-between sm:text-[18px] text-[16px] sm:px-[4rem] px-[1rem] text-gray-600">
               <span>Transaction Status</span>
               <span>
