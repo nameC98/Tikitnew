@@ -41,7 +41,7 @@ function App() {
         },
 
         {
-          path: "thankyou",
+          path: "thankyou/:orderUid",
           element: <ThankYou />,
         },
         {

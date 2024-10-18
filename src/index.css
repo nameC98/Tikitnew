@@ -121,7 +121,7 @@ a {
 }
 
 .banner {
-  @apply text-white relative bg-cover bg-center sm:h-[80vh] h-[100vh] flex flex-col justify-center items-center bg-fixed;
+  @apply text-white relative bg-cover bg-center h-[30vh] flex flex-col justify-center items-center bg-fixed;
 }
 
 .banner__overlay {
@@ -163,7 +163,7 @@ a {
     Event Details Section
 ***********************************/
 .event-details {
-  @apply relative h-[100%] lg:h-[450px] bg-cover bg-center bg-no-repeat;
+  @apply relative h-[100%] lg:h-[450px] bg-cover bg-center bg-no-repeat z-0;
 }
 
 /* make icons inline */
@@ -176,8 +176,7 @@ a {
 }
 
 .event-details__card {
-  @apply relative  flex justify-center items-center min-h-screen;
-
+  @apply relative  flex justify-center items-center h-[60vh];
   .button {
     @apply relative top-5;
   }

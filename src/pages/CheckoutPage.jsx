@@ -155,7 +155,7 @@ function CheckoutPage() {
           `https://api.tikiti.co.zw/opn/v1/orders/${orderUid}/initiate-payment`,
           {
             paymentMethod: "ONLINE",
-            returnUrl: `https://tikitnew.vercel.app/thankyou?orderUid=${orderUid}`,
+            returnUrl: `https://tikitnew.vercel.app/thankyou/${orderUid}`,
           },
           { headers: { "Content-Type": "application/json" } }
         );
@@ -272,7 +272,7 @@ function CheckoutPage() {
       <Navbar />
 
       {/* Hero Section */}
-      <header className="banner" style={{ backgroundImage: `url(${heroImg})` }}>
+      <header className="banner" style={{ backgroundImage: `url(${banner})` }}>
         <div className="banner__overlay"></div>
         <motion.div
           className="flex flex-col justify-center items-center "

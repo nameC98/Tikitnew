@@ -164,6 +164,8 @@ function GetEventID() {
 
   // Handle quantity changes for both ticket types
   const handleQuantityChange = (ticket) => (event) => {
+    console.log(event.target.value);
+
     const value = Number(event.target.value);
     setQuantities((prev) => ({
       ...prev,
@@ -187,7 +189,9 @@ function GetEventID() {
       console.log(bookedTickets);
 
       // Process for navigation after booking
-      if (bookedTickets.length > 0) {
+      if (bookedTickets.length > 1) {
+        alert("You can only select one ticket at a time.");
+      } else if (bookedTickets.length === 1) {
         navigate(`/checkoutpage/${eventId}`, {
           state: {
             bookedTickets,
@@ -196,10 +200,10 @@ function GetEventID() {
             session,
           },
         });
-        handleCloseModal();
       } else {
         alert("Please select at least one ticket to book.");
       }
+      handleCloseModal();
     } catch (error) {
       console.error("Error during booking:", error.response?.data);
       alert(
@@ -238,14 +242,14 @@ function GetEventID() {
 
       {/* Event Details */}
       <section
-        class="event-details"
+        class="event-details "
         style={{
           backgroundImage: `url(${baseImageUrl}?fileName=${selectedEvent.imageFileName})`,
         }}
       >
         <div class="event-details__overlay"></div>
 
-        <div class="event-details__card">
+        <div class="event-details__card ">
           <div class="event-details__card-background">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="md:col-span-3">
@@ -289,7 +293,7 @@ function GetEventID() {
       </section>
 
       {/* Purchase Tickets */}
-      <section class="content-area">
+      <section class="content-area z-50">
         <h2>Purchase Tickets</h2>
         {tickets.map((ticket) => {
           return (
@@ -319,16 +323,16 @@ function GetEventID() {
                     <input
                       id={`quantity-${ticket.uid}`}
                       type="number"
-                      value={quantities[ticket.name.toLowerCase()] || 0}
+                      value={quantities[ticket.name.toLowerCase()] || "0"}
                       onChange={handleQuantityChange(ticket)}
-                      className="purchase-ticket__quantity w-[13rem]"
+                      className="purchase-ticket__quantity w-[13rem] z-50"
                       min="0"
-                      max="100"
+                      max="1"
                     />
 
-                    <div class="purchase-ticket__remove">
+                    {/* <div class="purchase-ticket__remove">
                       <IoTrashOutline />
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
