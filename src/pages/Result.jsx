@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "../assets/img/gospel.jpg";
 import { Link, useParams } from "react-router-dom";
 import Footer from "../components/Footer";
+import axios from "axios";
 
 const Result = () => {
   const [order, setOrder] = useState();
@@ -10,21 +11,23 @@ const Result = () => {
 
   console.log(orderUid);
 
-  // useEffect(() => {
-  //   const fetchEvents = async () => {
-  //     try {
-  //       const response = await axios.get(
-  //         `https://api.tikiti.co.zw/opn/v1/session/${session.uid}/cart`
-  //       );
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get(
+          `https://api.tikiti.co.zw/opn/v1/orders/${orderUid}`
+        );
 
-  //       setcartUid(response.data.uid);
-  //     } catch (error) {
-  //       console.error("Error fetching events:", error);
-  //     }
-  //   };
+        setOrder(response.data);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    };
 
-  //   fetchEvents();
-  // }, []);
+    fetchEvents();
+  }, []);
+
+  console.log(order);
 
   return (
     <>
