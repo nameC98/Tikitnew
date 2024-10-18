@@ -7,7 +7,7 @@ import GetEventID from "./pages/GetEventID";
 import Purchaseticket from "./pages/Purchaseticket";
 import CheckoutPage from "./pages/CheckoutPage";
 import ConfirmationPage from "./pages/ConfirmationPage";
-import ThankYou from "./pages/ThankYou";
+import Result from "./pages/Result";
 import PurchaseFailed from "./pages/PurchaseFailed";
 
 function App() {
@@ -41,8 +41,8 @@ function App() {
         },
 
         {
-          path: "thankyou/:orderUid",
-          element: <ThankYou />,
+          path: "result/:orderUid",
+          element: <Result />,
         },
         {
           path: "purchasefailed",

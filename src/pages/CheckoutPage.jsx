@@ -155,7 +155,7 @@ function CheckoutPage() {
           `https://api.tikiti.co.zw/opn/v1/orders/${orderUid}/initiate-payment`,
           {
             paymentMethod: "ONLINE",
-            returnUrl: `https://tikitnew.vercel.app/thankyou/${orderUid}`,
+            returnUrl: `https://tikitnew.vercel.app/result/${orderUid}`,
           },
           { headers: { "Content-Type": "application/json" } }
         );
