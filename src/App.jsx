@@ -41,7 +41,7 @@ function App() {
         },
 
         {
-          path: "result",
+          path: "result/:orderUid",
           element: <Result />,
         },
         {
