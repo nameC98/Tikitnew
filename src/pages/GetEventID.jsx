@@ -254,13 +254,8 @@ function GetEventID() {
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="md:col-span-3">
                 <h2>{selectedEvent.name}</h2>
-                <p>Organized by: Zimpraise</p>
-                <p>
-                  {selectedEvent.details} Lorem ipsum dolor sit, amet
-                  consectetur adipisicing elit. Accusamus deserunt repellendus
-                  ut fugit, id inventore temporibus aperiam numquam facere
-                  suscipit est assumenda minima.
-                </p>
+
+                <p>{selectedEvent.details}</p>
               </div>
 
               <div className="md:col-span-1">
@@ -281,7 +276,7 @@ function GetEventID() {
                     to="location"
                     smooth={true}
                     duration={800}
-                    className="button"
+                    className="button "
                   >
                     View Map
                   </Link>
@@ -327,7 +322,7 @@ function GetEventID() {
                       onChange={handleQuantityChange(ticket)}
                       className="purchase-ticket__quantity w-[13rem] z-50"
                       min="0"
-                      max="1"
+                      max="3"
                     />
 
                     {/* <div class="purchase-ticket__remove">
@@ -383,7 +378,7 @@ function GetEventID() {
 
           <iframe
             className="w-full h-[450px] relative z-40"
-            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15193.470280343081!2d30.9950297!3d-17.8213959!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1931a5da14f14cfd%3A0xd2e9507a9581c24b!2sNational%20Sports%20Stadium!5e0!3m2!1sen!2szw!4v1728120210313!5m2!1sen!2szw"
+            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d578115.2327895475!2d31.088239690459698!3d-17.841920919324846!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1931a4f8c10a6337%3A0x8efaf46a62111eef!2sThe%20Rainbow%20Towers%20Hotel%20and%20Conference%20Centre!5e0!3m2!1sen!2szw!4v1729594233169!5m2!1sen!2szw"
             width="1000"
             height="450"
             loading="lazy"

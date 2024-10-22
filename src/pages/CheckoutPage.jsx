@@ -122,13 +122,17 @@ function CheckoutPage() {
 
         console.log(purchaseDetails);
         console.log(ticketHolders[ticket.name]);
+        console.log(ticket.quantity);
 
         const payload = {
           parentUid: cartUid,
           productUid: ticket.uid,
           totalAmount: ticketTotalPrice,
+          quantity: ticket.quantity,
           purchaseDetails,
         };
+
+        console.log(payload);
 
         const addItemsResponse = await axios.post(
           `https://api.tikiti.co.zw/opn/v1/cart/${cartUid}/add-items`,
