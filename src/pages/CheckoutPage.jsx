@@ -141,36 +141,51 @@ function CheckoutPage() {
         console.log("cart:", addItemsResponse.data);
         const { cartItem } = addItemsResponse.data;
         newBookedTickets.push(cartItem);
+
+        console.log(cartItem);
       }
 
       // Proceed with the checkout
       const response = await axios.post(
         `https://api.tikiti.co.zw/opn/v1/cart/${cartUid}/checkout?email=${userEmail}`,
         {
-          productUid: updatedBookedTickets[0]?.uid || "",
+          // cartUid: updatedBookedTickets[0]?.uid || "",
         },
         { headers: { "Content-Type": "application/json" } }
       );
+      console.log("cart:", response.data);
+      const responseamount = response.data?.amount;
+      console.log(responseamount);
 
       const orderUid = response.data?.orderNumber;
 
       if (orderUid) {
-        const paymentResponse = await axios.post(
-          `https://api.tikiti.co.zw/opn/v1/orders/${orderUid}/initiate-payment`,
-          {
-            paymentMethod: "ONLINE",
-            returnUrl: `https://tikitnew.vercel.app/result/${orderUid}`,
-          },
-          { headers: { "Content-Type": "application/json" } }
-        );
-        console.log("Checkout Success:", paymentResponse.data);
-        console.log(
-          "Payment URL:",
-          paymentResponse.data.paymentTransaction.redirectUrl
-        );
+        if (responseamount !== 0) {
+          const paymentResponse = await axios.post(
+            `https://api.tikiti.co.zw/opn/v1/orders/${orderUid}/initiate-payment`,
+            {
+              paymentMethod: "ONLINE",
+              returnUrl: `https://tikitnew.vercel.app/result/${orderUid}`,
+            },
+            { headers: { "Content-Type": "application/json" } }
+          );
+          console.log("Checkout Success:", paymentResponse.data);
 
-        const paymentUrl = paymentResponse.data.paymentTransaction.redirectUrl;
-        window.location.href = paymentUrl;
+          const paymentUrl =
+            paymentResponse.data.paymentTransaction.redirectUrl;
+          window.location.href = paymentUrl;
+        } else if (responseamount === 0) {
+          // Redirect to results page directly
+          // window.location.href = `https://tikitnew.vercel.app/result/${orderUid}`;
+        }
+
+        // console.log(
+        //   "Payment URL:",
+        //   paymentResponse.data.paymentTransaction.redirectUrl
+        // );
+
+        // const paymentUrl = paymentResponse.data.paymentTransaction.redirectUrl;
+        // window.location.href = paymentUrl;
       } else {
         setError("Failed to process checkout. Please try again.");
       }
@@ -291,22 +306,22 @@ function CheckoutPage() {
         </motion.div>
       </header>
 
-      <div class="content-area">
-        <div class="billing-info">
+      <div className="content-area">
+        <div className="billing-info">
           {updatedBookedTickets.map((ticket, ticketIndex) => (
             <>
-              <section class="ticket-holder">
-                <h2 class="ticket-holder__event-name">{ticket.name}</h2>
+              <section className="ticket-holder">
+                <h2 className="ticket-holder__event-name">{ticket.name}</h2>
 
                 {Array.from({ length: ticket.quantity }).map((_, index) => (
-                  <div class="flex flex-col lg:flex-row lg:space-x-4 lg:items-center">
+                  <div className="flex flex-col lg:flex-row lg:space-x-4 lg:items-center">
                     {registrationFields && registrationFields.length > 0 ? (
                       registrationFields.map((field) => (
                         <>
-                          <div class="w-full lg:w-2/5">
+                          <div className="w-full lg:w-2/5">
                             <label
-                              for="name"
-                              class="block text-sm font-medium text-gray-600"
+                              htmlFor="name"
+                              className="block text-sm font-medium text-gray-600"
                             >
                               {field.displayName}:
                               <input
@@ -327,7 +342,7 @@ function CheckoutPage() {
                                     e.target.value
                                   )
                                 }
-                                class="mt-1 p-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                className="mt-1 p-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                                 required={field.mandatory}
                               />
                             </label>
@@ -337,7 +352,7 @@ function CheckoutPage() {
                     ) : (
                       <p>No registration fields available.</p>
                     )}
-                    <div class="mt-6 lg:pl-5 w-full lg:w-1/5 flex justify-start">
+                    <div className="mt-6 lg:pl-5 w-full lg:w-1/5 flex justify-start">
                       <button className="ticket-holder__remove">
                         <IoTrashOutline
                           onClick={() =>
@@ -353,20 +368,20 @@ function CheckoutPage() {
           ))}
 
           {/* <!-- Order Summary --> */}
-          <div class="order-summary">
-            <h2 class="text-xl font-semibold mb-4 text-gray-700">
+          <div className="order-summary">
+            <h2 className="text-xl font-semibold mb-4 text-gray-700">
               Order Summary
             </h2>
             {updatedBookedTickets.map((ticket, ticketIndex) => (
               <>
-                <div class="border-b pb-4 mb-4">
-                  <div class="flex justify-between">
+                <div className="border-b pb-4 mb-4">
+                  <div className="flex justify-between">
                     <span>{ticket.name}</span>
                     <span>{ticket.price}</span>
                   </div>
                 </div>
 
-                <div class="flex justify-between font-semibold text-gray-700">
+                <div className="flex justify-between font-semibold text-gray-700">
                   <span>Total</span>
                   <span>${calculateTotalPrice()}</span>
                 </div>
@@ -381,7 +396,7 @@ function CheckoutPage() {
             />
             <button
               onClick={handleCheckout}
-              class="w-full mt-4 bg-green-600 text-white  font-semibold py-2 rounded-md hover:bg-green-700 transition duration-300"
+              className="w-full mt-4 bg-green-600 text-white  font-semibold py-2 rounded-md hover:bg-green-700 transition duration-300"
             >
               Place Order
             </button>

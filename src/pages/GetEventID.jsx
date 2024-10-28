@@ -92,6 +92,8 @@ function GetEventID() {
     setIsModalOpen(true);
   };
 
+  console.log(selectedEvent.paymentMethodCodes[0]);
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -200,6 +202,19 @@ function GetEventID() {
             session,
           },
         });
+      } else if (selectedEvent.paymentMethodCodes[0] === "FREE") {
+        if (bookedTickets.length > 1) {
+          navigate(`/checkoutpage/${eventId}`, {
+            state: {
+              bookedTickets,
+              totalPrice,
+              registrationId: selectedEvent?.eventType.uid,
+              session,
+            },
+          });
+        } else {
+          alert("Please select quantity to get your free ticket.");
+        }
       } else {
         alert("Please select at least one ticket to book.");
       }
@@ -305,7 +320,12 @@ function GetEventID() {
 
                   <div class="md:col-span-1">
                     <p>Price</p>
-                    <h3 class="purchase-ticket__price">${ticket.price}</h3>
+                    <h3 class="purchase-ticket__price">
+                      ${" "}
+                      {selectedEvent.paymentMethodCodes[0] === "FREE"
+                        ? "0"
+                        : ticket.price}
+                    </h3>
                   </div>
 
                   <div class="md:col-span-1">
@@ -315,15 +335,27 @@ function GetEventID() {
                     >
                       <p>Quantity</p>
                     </label>
-                    <input
-                      id={`quantity-${ticket.uid}`}
-                      type="number"
-                      value={quantities[ticket.name.toLowerCase()] || "0"}
-                      onChange={handleQuantityChange(ticket)}
-                      className="purchase-ticket__quantity w-[13rem] z-50"
-                      min="0"
-                      max="3"
-                    />
+                    {selectedEvent.paymentMethodCodes[0] === "FREE" ? (
+                      <input
+                        id={`quantity-${ticket.uid}`}
+                        type="number"
+                        value={quantities[ticket.name.toLowerCase()] || "0"}
+                        onChange={handleQuantityChange(ticket)}
+                        className="purchase-ticket__quantity w-[13rem] z-50"
+                        min="0"
+                        max="1"
+                      />
+                    ) : (
+                      <input
+                        id={`quantity-${ticket.uid}`}
+                        type="number"
+                        value={quantities[ticket.name.toLowerCase()] || "0"}
+                        onChange={handleQuantityChange(ticket)}
+                        className="purchase-ticket__quantity w-[13rem] z-50"
+                        min="0"
+                        max="3"
+                      />
+                    )}
 
                     {/* <div class="purchase-ticket__remove">
                       <IoTrashOutline />
@@ -342,9 +374,16 @@ function GetEventID() {
             Total: {tickets.length > 0 ? tickets[0].currencyCode : "USD"}{" "}
             {totalPrice.toFixed(2)}
           </h2>
-          <Link onClick={handleBook} className="button" to="#">
-            Book Tickets
-          </Link>
+
+          {selectedEvent.paymentMethodCodes[0] === "FREE" ? (
+            <Link to="/result" onClick={handleBook} className="button">
+              Get Free Ticket
+            </Link>
+          ) : (
+            <Link onClick={handleBook} className="button" to="#">
+              Book Tickets
+            </Link>
+          )}
         </div>
       </section>
 
